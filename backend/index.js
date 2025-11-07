@@ -13,8 +13,15 @@ const postRoutes = require("./routes/posts.route")
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173",   // your React frontend
+    credentials: true,                 // allow cookies
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // DB Connection
 connectDB();

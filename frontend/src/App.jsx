@@ -1,38 +1,80 @@
-import React from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Home from '../pages/Home'
-import Learn from '../pages/Learn'
-import Layout from './components/layouts/Layout'
-import CreateContent from '../pages/CreateContent'
-import CreateHomePage from './components/CreateHomePage'
-import AboutPage from '../pages/AboutPage'
-import ContactPage from '../pages/Contactpage'
-import ReadContent from '../pages/ReadContent'
-import Login from '../pages/Login'
-import Signup from '../pages/Signup'
-import LandingPage from '../pages/LandingPage'
+// src/App.jsx
+import React from "react";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import Layout from "./components/layouts/Layout"; // contains Header + Footer
+import LandingPage from "../pages/LandingPage";
+import AboutPage from "../pages/AboutPage";
+import ContactPage from "../pages/Contactpage";
+
+import Home from "../pages/Home";
+import Learn from "../pages/Learn";
+import CreateContent from "../pages/CreateContent";
+import ReadContent from "../pages/ReadContent";
+
+// Auth pages (no header/footer)
+import Login from "../pages/Login";
+import Signup from "../pages/Signup";
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Layout wraps all pages */}
-        <Route path="/" element={<Layout />}>
-          {/* index = default route inside Layout */}
-          <Route index element={<LandingPage />} />
-        <Route path="/home" element={<Home />} />
-          <Route path="/learn" element={<Learn />} />
-          <Route path="/create" element={<CreateContent />} />
-          <Route path="/read" element={<ReadContent />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact-us" element={<ContactPage />} />
+      <AuthProvider>
+        <Routes>
+          {/* ===== Auth routes (no header/footer) ===== */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-        </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
+          {/* ===== Pages that use Layout (header/footer included) ===== */}
+          <Route path="/" element={<Layout />}>
+            {/* Landing is index under Layout */}
+            <Route index element={<LandingPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="contact-us" element={<ContactPage />} />
+
+            {/* Protected pages (still children of Layout so they include header/footer) */}
+            <Route
+              path="discover"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="learn"
+              element={
+                <ProtectedRoute>
+                  <Learn />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="create"
+              element={
+                <ProtectedRoute>
+                  <CreateContent />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="read"
+              element={
+                <ProtectedRoute>
+                  <ReadContent />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+
+          {/* optional: catch-all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,105 +1,166 @@
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import Button from '../Button'
-import '../../../global.css';
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Button from "../Button";
+import { useAuth } from "../../context/AuthContext";
+
 
 function Header() {
-  const location = useLocation()
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  console.log(user)
+
+  // ✅ Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+
+
+  // ✅ Logout + redirect to landing page
+  const handleLogout = async () => {
+    try {
+      await logout();      // Clears token + user
+      setOpen(false);      // Close dropdown
+
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   const Navigations = [
-    { name: "Discover", route: "/" },
+    { name: "Discover", route: "/discover" },
     { name: "Learn", route: "/learn" },
     { name: "About", route: "/about" },
-    { name: "Contact Us", route: "/contact-us" }
-  ]
+    { name: "Contact Us", route: "/contact-us" },
+  ];
 
   return (
     <header className="w-full z-50 fixed top-0 h-20 backdrop-blur-md bg-[#130F0B] flex items-center justify-between px-6 lg:px-28 transition-colors duration-300">
-      {/* 🔹 Brand Logo */}
-      <div className="text-3xl font-bold text-gray-900 dark:text-white">
-        <Link to="/">Write<span className="text-yellow-600 dark:text-yellow-400">ora.</span></Link>
+      {/* ✅ Logo */}
+      <div className="text-3xl font-bold text-white">
+        <Link to="/">
+          Write<span className="text-yellow-500">ora.</span>
+        </Link>
       </div>
 
-      {/* 🔹 Navigation Links */}
-      <nav className="flex items-center gap-6">
-        {Navigations.map((n) => {
-          const isActive = location.pathname === n.route
-          return (
-            <Link
-              key={n.route}
-              to={n.route}
-              className={`transition-colors text-lg duration-200 ${
-                isActive
-                  ? "text-yellow-600 dark:text-yellow-400 font-semibold"
-                  : "text-gray-700 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400"
-              }`}
-            >
-              {n.name}
-            </Link>
-          )
-        })}
-      </nav>
+      {/* ✅ Navigation Links (only visible when logged in) */}
+      {user && (
+        <nav className="hidden md:flex items-center gap-6">
+          {Navigations.map((n) => {
+            const isActive = location.pathname === n.route;
+            return (
+              <Link
+                key={n.route}
+                to={n.route}
+                className={`transition-colors text-lg duration-200 ${
+                  isActive
+                    ? "text-yellow-500 font-semibold"
+                    : "text-gray-300 hover:text-yellow-400"
+                }`}
+              >
+                {n.name}
+              </Link>
+            );
+          })}
+        </nav>
+      )}
 
-      {/* 🔹 Auth Buttons (Commented for now) */}
-      {/*
+      {/* ✅ Auth Section */}
       <div className="flex items-center gap-4">
-        <Button className="bg-transparent border text-gray-800 dark:text-gray-200 font-medium border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 rounded-lg transition-all">
-          Login
-        </Button>
+        {!user ? (
+          <>
+            {/* 🟡 Show only if NOT logged in */}
+            <Button
+              onClick={() => navigate("/login")}
+              className="px-5 py-2 bg-transparent border border-yellow-500 text-yellow-400 hover:bg-yellow-600 hover:text-black rounded-lg transition"
+            >
+              Login
+            </Button>
+            <Button
+              onClick={() => navigate("/signup")}
+              className="px-5 py-2 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-600 transition"
+            >
+              Get Started
+            </Button>
+          </>
+        ) : (
+          /* 🧠 Profile Dropdown */
+          <div ref={dropdownRef} className="relative">
+            <button
+              onClick={() => setOpen(!open)}
+              className="flex items-center gap-2 bg-[#1C1813] hover:bg-[#241F1A] 
+                text-gray-100 border border-[#2A2520] px-3 py-2 rounded-xl transition-all"
+            >
+              <img
+                src={
+                  user?.avatar ||
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgmNDDrkYKiQyONYsHR_3HM510JJNSrEkgEg&s"
+                }
+                alt="Profile"
+                className="w-8 h-8 rounded-full"
+              />
+              <span className="font-medium text-yellow-400">
+                {user?.user?.name || "User"}
+              </span>
 
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold shadow-md transition-all">
-          Start Here
-        </Button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`w-4 h-4 text-yellow-400 transition-transform duration-300 ${
+                  open ? "rotate-180" : "rotate-0"
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            {open && (
+              <div
+                className="absolute right-0 w-48 bg-[#1C1813] border border-[#2A2520]
+                text-gray-200 shadow-lg rounded-xl mt-2 z-50"
+              >
+                <Link
+                  to="/profile"
+                  className="block px-4 py-2 hover:bg-[#241F1A] text-yellow-400 rounded-t-xl transition"
+                >
+                  Profile
+                </Link>
+                <Link
+                  to="/settings"
+                  className="block px-4 py-2 hover:bg-[#241F1A] text-yellow-400 transition"
+                >
+                  Settings
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-red-500 hover:bg-[#241F1A] rounded-b-xl transition"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      */}
-
-     {/* 🔹 Account Section */}
-<div className="relative group">
-  <button className="flex items-center gap-2 bg-[#1C1813] hover:bg-[#241F1A] text-gray-100 border border-[#2A2520] p-2 rounded-xl transition-all">
-    <img
-      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgmNDDrkYKiQyONYsHR_3HM510JJNSrEkgEg&s"
-      alt="Profile"
-      className="w-8 h-8 rounded-full"
-    />
-    <span className="font-medium text-[#F5C542]">Sumit</span>
-
-    {/* Down Arrow Icon */}
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-4 h-4 text-[#F5C542] transition-transform duration-300 group-hover:rotate-180"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-    </svg>
-  </button>
-
-  {/* Dropdown */}
-  <div className="absolute right-0 mt-2 w-48 bg-[#1C1813] border border-[#2A2520] text-gray-200 shadow-lg rounded-xl hidden group-hover:block transition-all duration-200">
-    <Link
-      to="/profile"
-      className="block px-4 py-2 hover:bg-[#241F1A] text-[#F5C542] rounded-t-xl"
-    >
-      Profile
-    </Link>
-    <Link
-      to="/settings"
-      className="block px-4 py-2 hover:bg-[#241F1A] text-[#F5C542]"
-    >
-      Settings
-    </Link>
-    <Link
-      to="/logout"
-      className="block px-4 py-2 text-red-500 hover:bg-[#241F1A] rounded-b-xl"
-    >
-      Logout
-    </Link>
-  </div>
-</div>
-
     </header>
-  )
+  );
 }
 
-export default Header
+export default Header;

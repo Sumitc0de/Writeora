@@ -1,5 +1,5 @@
 import React from "react";
-import { Search } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import DiscoverSection from "../src/components/Discover";
 import Button from "../src/components/Button";
 import { Link } from "react-router-dom";
@@ -18,14 +18,14 @@ function Home() {
           </span>
         </h1>
 
-<Link to="/create">
-  <Button className="relative px-8 py-3 rounded-xl font-semibold text-black bg-linear-to-r from-yellow-500 to-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)] hover:shadow-[0_0_25px_rgba(234,179,8,0.6)] hover:scale-105 transition-all duration-300">
-    <span className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.25),transparent_40%)] animate-pulse"></span>
-    <span className="relative z-10 flex items-center gap-2">
-      ✨ Create Something Epic
-    </span>
-  </Button>
-</Link>
+        <Link to="/create">
+          <Button className="relative px-8 py-3 rounded-xl font-semibold text-black bg-linear-to-r from-yellow-500 to-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)] hover:shadow-[0_0_25px_rgba(234,179,8,0.6)] hover:scale-105 transition-all duration-300">
+            <span className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.25),transparent_40%)] animate-pulse"></span>
+            <span className="relative z-10 flex items-center gap-2">
+              <Sparkles />   Create Something Epic
+            </span>
+          </Button>
+        </Link>
 
 
 

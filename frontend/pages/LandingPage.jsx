@@ -1,24 +1,44 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { PenTool, Brain, BookOpen, Sparkles, Users } from "lucide-react";
 import Button from "../src/components/Button";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useAuth } from "../src/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import Home from "./Home"; // used only if you want inline render (not required for redirect)
 
 const LandingPage = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to discover/home when auth finished loading and user exists
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/discover", { replace: true });
+    }
+  }, [user, loading, navigate]);
+
+  const handleClick = () => {
+    if (!user) {
+      navigate("/login");
+    } else {
+      navigate("/discover");
+    }
+  };
+
   return (
     <div className="bg-[#0F0D0A] text-white min-h-screen overflow-hidden">
       {/* 🦾 Hero Section */}
-      <section className="min-h-screen flex flex-col md:flex-row items-center justify-between px-10 md:px-20 py-20">
+      <section className="min-h-screen flex flex-col md:flex-row items-center justify-between lg:px-28 md:px-20 py-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           className="max-w-xl text-center md:text-left"
         >
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-5">
+          <h1 className="text-7xl font-extrabold leading-tight mb-5">
             Write Smarter. <br />
             Learn Together. <br />
-            <span className="text-yellow-500">Welcome to Writeora.</span>
+            <span className="text-yellow-500 text-5xl">Welcome to Writeora.</span>
           </h1>
           <p className="text-gray-400 text-lg mb-8 leading-relaxed">
             Writeora is your AI-powered creative workspace — built for{" "}
@@ -28,11 +48,12 @@ const LandingPage = () => {
           </p>
 
           <div className="flex justify-center md:justify-start gap-4">
-            <Link to='/create'>
-            <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-7 py-3 rounded-xl text-lg shadow-md hover:shadow-lg transition">
+            <Button
+              onClick={handleClick}
+              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-7 py-3 rounded-xl text-lg shadow-md hover:shadow-lg transition"
+            >
               ✍️ Start Writing
             </Button>
-            </Link>
             <Button className="border border-yellow-500 text-yellow-400 hover:bg-yellow-600 hover:text-black px-7 py-3 rounded-xl text-lg transition">
               🚀 Learn More
             </Button>
@@ -54,7 +75,7 @@ const LandingPage = () => {
       </section>
 
       {/* 🧠 Features Section */}
-      <section className="px-10 md:px-20 py-20 bg-[#14110D] border-t border-[#2A2520]">
+      <section className="lg:px-28 md:px-20 py-20 bg-[#14110D] border-t border-[#2A2520]">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -88,13 +109,17 @@ const LandingPage = () => {
       <section className="px-10 md:px-20 py-20 bg-[#0F0D0A] text-center">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl font-bold mb-6 leading-tight">
-            Learn by Writing. <span className="text-yellow-500">Teach by Sharing.</span>
+            Learn by Writing.{" "}
+            <span className="text-yellow-500">Teach by Sharing.</span>
           </h2>
           <p className="text-gray-400 mb-10 text-lg leading-relaxed">
             Every time you write, you learn. Every time you share, someone grows.{" "}
             Writeora helps you do both — powered by AI that amplifies your voice.
           </p>
-          <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-7 py-3 rounded-xl text-lg">
+          <Button
+            onClick={handleClick}
+            className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-7 py-3 rounded-xl text-lg"
+          >
             Explore Learning
           </Button>
         </div>
@@ -125,7 +150,10 @@ const LandingPage = () => {
           Create meaningful content with AI assistance. Inspire millions through
           your words.
         </p>
-        <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-3 rounded-xl text-lg shadow-md hover:shadow-lg transition">
+        <Button
+          onClick={handleClick}
+          className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-3 rounded-xl text-lg shadow-md hover:shadow-lg transition"
+        >
           Get Started for Free
         </Button>
       </footer>

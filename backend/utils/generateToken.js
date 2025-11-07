@@ -1,21 +1,26 @@
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
 
-const generateToken = (res, userID) => {
-  const token = jwt.sign(
-    { userID },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
-
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // Only use secure in production
-    sameSite: "strict", // Changed from lax to strict for better security
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+const createTokenCookie = (res, userId) => {
+  const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
   });
 
-  return token; // Return token for flexibility
+  const isProd = process.env.NODE_ENV === "production";
+
+  const cookieOptions = {
+    httpOnly: true,
+    secure: isProd, // send only over HTTPS in production
+    sameSite: isProd ? "none" : "lax", // 'none' required for cross-site cookie in prod with secure
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  };
+
+  // optionally set domain if configured (useful for subdomains)
+  if (process.env.COOKIE_DOMAIN) cookieOptions.domain = process.env.COOKIE_DOMAIN;
+
+  res.cookie("token", token, cookieOptions);
+
+  return token;
 };
 
-module.exports = generateToken;
+module.exports = createTokenCookie;
