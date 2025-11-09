@@ -4,13 +4,13 @@ const Posts = require("../models/posts.model");
 
 const createPost = async (req, res) => {
     try {
-        const { title, subtitle, headerImage, category, content, hashtags, contentImage } = req.body;
+        const { title, subtitle, category, content, hashtags, contentImage } = req.body;
 
         const newPost = await Posts.create({
             author: req.user.id,
             title,
             subtitle,
-            headerImage,
+            // headerImage,
             category,
             content,
             hashtags,

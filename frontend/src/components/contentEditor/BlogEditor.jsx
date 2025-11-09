@@ -5,6 +5,8 @@ import EditorArea from "./EditorArea";
 import AITools from "./AITools";
 import LivePreview from "./LivePreview";
 import { FilePlus, Upload } from "lucide-react";
+import { createPost } from "../../service/postService"; // ✅ backend connection
+import { useAuth } from "../../context/AuthContext"; // ✅ get user token
 
 const BlogEditor = () => {
   const [title, setTitle] = useState("");
@@ -14,8 +16,9 @@ const BlogEditor = () => {
   const [content, setContent] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [template, setTemplate] = useState("");
-
   const editorRef = useRef(null);
+
+  const { user } = useAuth(); // ✅ access logged-in user token
 
   // Prevent cursor jump on Enter
   useEffect(() => {
@@ -31,9 +34,61 @@ const BlogEditor = () => {
     return () => editor.removeEventListener("keydown", handleEnter);
   }, []);
 
-  // Publish / Draft simulation
-  const handlePublish = () => alert("🚀 Article published successfully!");
-  const handleDraft = () => alert("💾 Saved as draft!");
+  // ✅ Auto-load local draft
+  useEffect(() => {
+    const savedDraft = localStorage.getItem("draft");
+    if (savedDraft) {
+      const parsed = JSON.parse(savedDraft);
+      setTitle(parsed.title || "");
+      setSubtitle(parsed.subtitle || "");
+      setCategory(parsed.category || "");
+      setContent(parsed.content || "");
+      setHeaderImage(parsed.headerImage || "");
+    }
+  }, []);
+
+  // ✅ Save as Draft (localStorage)
+  const handleDraft = () => {
+    const draft = { title, subtitle, category, content, headerImage };
+    localStorage.setItem("draft", JSON.stringify(draft));
+    alert("💾 Draft saved locally!");
+  };
+
+  // ✅ Publish Post (to backend)
+  const handlePublish = async () => {
+    if (!title || !content) {
+      alert("⚠️ Please add a title and content before publishing!");
+      return;
+    }
+
+    const postData = {
+      title,
+      subtitle,
+      category,
+      content,
+      hashtags: [],
+      contentImage: headerImage,
+    };
+
+    try {
+      const token = user?.token;
+      const createdPost = await createPost(postData, token);
+
+      alert("🚀 Article published successfully!");
+      console.log("Created Post:", createdPost);
+
+      // Reset form
+      setTitle("");
+      setSubtitle("");
+      setCategory("");
+      setHeaderImage("");
+      setContent("");
+      localStorage.removeItem("draft");
+    } catch (error) {
+      console.error("Publish Error:", error);
+      alert("❌ Failed to publish post. Please try again.");
+    }
+  };
 
   return (
     <div className="min-h-screen pt-24 bg-[#130F0B] text-gray-100 p-8">
@@ -48,44 +103,43 @@ const BlogEditor = () => {
         />
 
         {/* ===== Header Image ===== */}
-{/* ===== Header Image ===== */}
-<div className="relative">
-  {headerImage ? (
-    <img
-      src={headerImage}
-      alt="Header"
-      className="w-full h-64 object-cover rounded-2xl shadow-lg"
-    />
-  ) : (
-    <div className="w-full h-64 flex items-center justify-center bg-[#241F1A] rounded-2xl border border-[#2A2520] text-gray-500">
-      🖼 Header Image Preview
-    </div>
-  )}
+        <div className="relative">
+          {headerImage ? (
+            <img
+              src={headerImage}
+              alt="Header"
+              className="w-full h-64 object-cover rounded-2xl shadow-lg"
+            />
+          ) : (
+            <div className="w-full h-64 flex items-center justify-center bg-[#241F1A] rounded-2xl border border-[#2A2520] text-gray-500">
+              🖼 Header Image Preview
+            </div>
+          )}
 
-  {/* Hidden File Input */}
-  <input
-    type="file"
-    accept="image/*"
-    onChange={(e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => setHeaderImage(reader.result);
-        reader.readAsDataURL(file);
-      }
-    }}
-    id="headerImageInput"
-    className="hidden"
-  />
+          {/* Hidden File Input */}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => setHeaderImage(reader.result);
+                reader.readAsDataURL(file);
+              }
+            }}
+            id="headerImageInput"
+            className="hidden"
+          />
 
-  {/* Upload Button */}
-  <label
-    htmlFor="headerImageInput"
-    className="absolute bottom-3 left-3 bg-yellow-600 hover:bg-yellow-500 text-black font-semibold px-4 py-1 rounded-md text-sm cursor-pointer transition-all duration-300 shadow-md hover:shadow-yellow-600/40"
-  >
-    Upload Header Image
-  </label>
-</div>
+          {/* Upload Button */}
+          <label
+            htmlFor="headerImageInput"
+            className="absolute bottom-3 left-3 bg-yellow-600 hover:bg-yellow-500 text-black font-semibold px-4 py-1 rounded-md text-sm cursor-pointer transition-all duration-300 shadow-md hover:shadow-yellow-600/40"
+          >
+            Upload Header Image
+          </label>
+        </div>
 
         {/* ===== Title / Subtitle / Category ===== */}
         <div>
@@ -127,6 +181,7 @@ const BlogEditor = () => {
           setContent={setContent}
         />
 
+        {/* ===== Action Buttons ===== */}
         <div className="flex justify-end gap-4 mt-6">
           <button
             onClick={handleDraft}

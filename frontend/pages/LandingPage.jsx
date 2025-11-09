@@ -7,15 +7,15 @@ import { useNavigate } from "react-router-dom";
 import Home from "./Home"; // used only if you want inline render (not required for redirect)
 
 const LandingPage = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to discover/home when auth finished loading and user exists
-  useEffect(() => {
-    if (!loading && user) {
-      navigate("/discover", { replace: true });
-    }
-  }, [user, loading, navigate]);
+  // // Redirect to discover/home when auth finished loading and user exists
+  // useEffect(() => {
+  //   if (!loading && user) {
+  //     navigate("/discover", { replace: true });
+  //   }
+  // }, [user, loading, navigate]);
 
   const handleClick = () => {
     if (!user) {
@@ -50,11 +50,18 @@ const LandingPage = () => {
           <div className="flex justify-center md:justify-start gap-4">
             <Button
               onClick={handleClick}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-7 py-3 rounded-xl text-lg shadow-md hover:shadow-lg transition"
+              className="relative px-7 py-2.5 rounded-lg font-semibold text-black 
+                 bg-linear-to-r from-yellow-500 to-yellow-400 
+                 border border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.5)] 
+                 hover:shadow-[0_0_30px_rgba(234,179,8,0.8)] 
+                 hover:scale-105 transition-all duration-300"
             >
-              ✍️ Start Writing
+              <span className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.2),transparent_40%)] animate-pulse"></span>
+              <span className="relative z-10"> ✍️ Start Writing</span>
             </Button>
-            <Button className="border border-yellow-500 text-yellow-400 hover:bg-yellow-600 hover:text-black px-7 py-3 rounded-xl text-lg transition">
+            <Button
+            onClick={()=> {navigate('/about')}}
+             className="border border-yellow-400 text-black hover:bg-yellow-600 px-7 py-3 rounded-lg text-lg transition">
               🚀 Learn More
             </Button>
           </div>
@@ -116,11 +123,17 @@ const LandingPage = () => {
             Every time you write, you learn. Every time you share, someone grows.{" "}
             Writeora helps you do both — powered by AI that amplifies your voice.
           </p>
+
           <Button
             onClick={handleClick}
-            className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-7 py-3 rounded-xl text-lg"
+            className="relative px-7 py-2.5 rounded-lg font-semibold text-black 
+                 bg-linear-to-r from-yellow-500 to-yellow-400 
+                 border border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.5)] 
+                 hover:shadow-[0_0_30px_rgba(234,179,8,0.8)] 
+                 hover:scale-105 transition-all duration-300"
           >
-            Explore Learning
+            <span className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.2),transparent_40%)] animate-pulse"></span>
+            <span className="relative z-10">Explore Learning</span>
           </Button>
         </div>
       </section>
@@ -150,12 +163,19 @@ const LandingPage = () => {
           Create meaningful content with AI assistance. Inspire millions through
           your words.
         </p>
+
         <Button
           onClick={handleClick}
-          className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-3 rounded-xl text-lg shadow-md hover:shadow-lg transition"
+          className="relative px-7 py-2.5 rounded-lg font-semibold text-black 
+                 bg-linear-to-r from-yellow-500 to-yellow-400 
+                 border border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.5)] 
+                 hover:shadow-[0_0_30px_rgba(234,179,8,0.8)] 
+                 hover:scale-105 transition-all duration-300"
         >
-          Get Started for Free
+          <span className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.2),transparent_40%)] animate-pulse"></span>
+          <span className="relative z-10"> Get Started for Free</span>
         </Button>
+
       </footer>
     </div>
   );

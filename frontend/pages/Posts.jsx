@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Share2, MessageCircle, Clock, User } from "lucide-react";
 
-const ReadContent = () => {
+const Posts = () => {
   const [comments, setComments] = useState([]);
   const [input, setInput] = useState("");
 
@@ -131,4 +131,4 @@ const ReadContent = () => {
   );
 };
 
-export default ReadContent;
+export default Posts;

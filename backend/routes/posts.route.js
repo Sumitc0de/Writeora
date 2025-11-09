@@ -7,11 +7,11 @@ const {
 const protect = require("../middlewares/authmiddleware")
 
 // ✅ Public
-router.get("/getall", getAllPosts);
+router.get("/", getAllPosts);
 // router.get("/:slugOrId", getPost);
 
 // ✅ Protected
-router.post("/create", protect, createPost);
+router.post("/", protect, createPost);
 // router.put("/:id", protect, updatePost);
 // router.delete("/:id", protect, deletePost);
 

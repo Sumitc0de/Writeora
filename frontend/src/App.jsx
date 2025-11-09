@@ -12,7 +12,7 @@ import ContactPage from "../pages/Contactpage";
 import Home from "../pages/Home";
 import Learn from "../pages/Learn";
 import CreateContent from "../pages/CreateContent";
-import ReadContent from "../pages/ReadContent";
+import Posts from "../pages/Posts";
 
 // Auth pages (no header/footer)
 import Login from "../pages/Login";
@@ -63,7 +63,7 @@ function App() {
               path="read"
               element={
                 <ProtectedRoute>
-                  <ReadContent />
+                  <Posts />
                 </ProtectedRoute>
               }
             />
