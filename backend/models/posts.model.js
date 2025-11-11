@@ -67,13 +67,13 @@ const postSchema = mongoose.Schema({
         }
     ],
 
-    keywords: [
-        {
-            type: String,
-            trim: true,
-            lowercase: true,
-        }
-    ],
+    // keywords: [
+    //     {
+    //         type: String,
+    //         trim: true,
+    //         lowercase: true,
+    //     }
+    // ],
 
     readingTime: {
         type: Number, // in minutes
