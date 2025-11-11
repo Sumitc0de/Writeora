@@ -2,6 +2,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { PostProvider } from "./context/PostContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Layout from "./components/layouts/Layout"; // contains Header + Footer
@@ -22,6 +23,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <PostProvider>
         <Routes>
           {/* ===== Auth routes (no header/footer) ===== */}
           <Route path="/login" element={<Login />} />
@@ -72,6 +74,7 @@ function App() {
           {/* optional: catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </PostProvider>
       </AuthProvider>
     </BrowserRouter>
   );

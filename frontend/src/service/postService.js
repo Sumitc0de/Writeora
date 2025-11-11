@@ -1,32 +1,22 @@
+// src/service/postService.js
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/posts"; // Change if hosted
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
-// ✅ Get all posts (public)
+// ✅ Global axios config
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true, // send cookies automatically
+});
+
+// ✅ Get all posts
 export const getAllPosts = async () => {
-  try {
-    const response = await axios.get(API_URL);
-    return response.data.posts;
-  } catch (error) {
-    console.error("Error fetching posts:", error);
-    throw error;
-  }
+  const { data } = await api.get("/posts/");
+  return data;
 };
 
-// ✅ Create a new post (requires token)
-export const createPost = async (postData, token) => {
-  try {
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // from logged-in user
-      },
-    };
-
-    const response = await axios.post(API_URL, postData, config);
-    return response.data.post;
-  } catch (error) {
-    console.error("Error creating post:", error);
-    throw error;
-  }
+// ✅ Create a new post
+export const createPost = async (postData) => {
+  const { data } = await api.post("/posts/", postData);
+  return data;
 };

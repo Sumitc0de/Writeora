@@ -1,47 +1,108 @@
-import React from "react";
-import { Bold, Italic, Underline, Link, Image as ImageIcon, Video } from "lucide-react";
+import React, { useRef } from "react";
+import { Bold, Italic, Underline, Link2, Image, Type } from "lucide-react";
 
 const Toolbar = ({ editorRef }) => {
-  const applyStyle = (cmd, val = null) => document.execCommand(cmd, false, val);
+  const fileInputRef = useRef(null);
 
-  const handleImageUpload = () => {
-    const url = prompt("Enter Image URL:");
-    if (url) document.execCommand("insertImage", false, url);
+  // Execute formatting commands
+  const handleCommand = (command, value = null) => {
+    document.execCommand(command, false, value);
+    editorRef.current.focus();
   };
 
-  const handleVideoInsert = () => {
-    const url = prompt("Enter YouTube/video embed URL:");
-    if (url)
-      document.execCommand(
-        "insertHTML",
-        false,
-        `<iframe src="${url}" width="400" height="250"></iframe>`
-      );
+  // Handle image upload
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const imgTag = `<img src="${reader.result}" alt="inserted" style="max-width:100%;border-radius:10px;margin:10px 0;" />`;
+      document.execCommand("insertHTML", false, imgTag);
+      editorRef.current.focus();
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle link insertion
+  const handleLink = () => {
+    const url = prompt("Enter the URL:");
+    if (url) {
+      document.execCommand("createLink", false, url);
+    }
+  };
+
+  // Handle headings
+  const handleHeading = () => {
+    const level = prompt("Enter heading level (1-6):", "2");
+    if (level >= 1 && level <= 6) {
+      document.execCommand("formatBlock", false, `h${level}`);
+    }
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 bg-[#241F1A] p-3 rounded-lg border border-[#2A2520]">
-      <button onClick={() => applyStyle("bold")}><Bold size={18} /></button>
-      <button onClick={() => applyStyle("italic")}><Italic size={18} /></button>
-      <button onClick={() => applyStyle("underline")}><Underline size={18} /></button>
+    <div className="flex flex-wrap items-center gap-2 bg-[#241F1A] border border-[#2A2520] p-2 rounded-lg mb-3">
+      {/* Bold */}
       <button
-        onClick={() => {
-          const color = prompt("Enter text color:");
-          if (color) applyStyle("foreColor", color);
-        }}
+        onClick={() => handleCommand("bold")}
+        className="p-2 hover:bg-yellow-600/30 rounded-md"
+        title="Bold"
       >
-        🎨
+        <Bold size={16} />
       </button>
+
+      {/* Italic */}
       <button
-        onClick={() => {
-          const link = prompt("Enter URL:");
-          if (link) applyStyle("createLink", link);
-        }}
+        onClick={() => handleCommand("italic")}
+        className="p-2 hover:bg-yellow-600/30 rounded-md"
+        title="Italic"
       >
-        <Link size={18} />
+        <Italic size={16} />
       </button>
-      <button onClick={handleImageUpload}><ImageIcon size={18} /></button>
-      <button onClick={handleVideoInsert}><Video size={18} /></button>
+
+      {/* Underline */}
+      <button
+        onClick={() => handleCommand("underline")}
+        className="p-2 hover:bg-yellow-600/30 rounded-md"
+        title="Underline"
+      >
+        <Underline size={16} />
+      </button>
+
+      {/* Heading */}
+      <button
+        onClick={handleHeading}
+        className="p-2 hover:bg-yellow-600/30 rounded-md"
+        title="Heading"
+      >
+        <Type size={16} />
+      </button>
+
+      {/* Link */}
+      <button
+        onClick={handleLink}
+        className="p-2 hover:bg-yellow-600/30 rounded-md"
+        title="Insert Link"
+      >
+        <Link2 size={16} />
+      </button>
+
+      {/* Image */}
+      <button
+        onClick={() => fileInputRef.current.click()}
+        className="p-2 hover:bg-yellow-600/30 rounded-md"
+        title="Insert Image"
+      >
+        <Image size={16} />
+      </button>
+
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleImageUpload}
+      />
     </div>
   );
 };

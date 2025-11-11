@@ -1,9 +1,8 @@
-import React from 'react'
-import BlogEditor from '../src/components/contentEditor/BlogEditor'
 
+import ContentEditor from '../src/components/contentEditor/ContentEditor'
 function CreateContent() {
   return (
-   <BlogEditor/>
+   <ContentEditor/>
   )
 }
 
