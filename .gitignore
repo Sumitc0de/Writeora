@@ -1,0 +1,19 @@
+# Backend
+backend/node_modules/
+backend/.env
+backend/.env.local
+
+# Frontend
+frontend/node_modules/
+frontend/.env
+frontend/.env.local
+
+# Logs
+*.log
+
+# Build
+frontend/build/
+backend/dist/
+
+# System
+.DS_Store
