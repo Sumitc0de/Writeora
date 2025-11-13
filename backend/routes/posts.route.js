@@ -3,12 +3,13 @@ const router = express.Router();
 const {
   createPost,
   getAllPosts,
+  getPostBySlug
 } = require("../controllers/post.controller");
 const protect = require("../middlewares/authmiddleware")
 
 // ✅ Public
 router.get("/", getAllPosts);
-// router.get("/:slugOrId", getPost);
+router.get("/:slug",getPostBySlug );
 
 // ✅ Protected
 router.post("/", protect, createPost);

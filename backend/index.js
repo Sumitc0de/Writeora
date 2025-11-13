@@ -3,18 +3,19 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 5000;
 const cors = require('cors');
+const path = require("path")
 const cookieParser = require("cookie-parser")
 
 // import modules
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/user.route'); // ✅ your user routes
 const postRoutes = require("./routes/posts.route")
-
+const uploadRoutes = require('./routes/upload.route')
 // Middlewares
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
-
+app.use(express.static(path.join(__dirname, "public")))
 app.use(
   cors({
     origin: "http://localhost:5173",   // your React frontend
@@ -35,6 +36,7 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/api/user', userRoutes); // ✅ attach routes
 app.use('/api/posts', postRoutes)
+app.use('/api/upload', uploadRoutes)
 // Start Server
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

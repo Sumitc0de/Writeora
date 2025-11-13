@@ -38,4 +38,16 @@ const getAllPosts = async (req, res) => {
   }
 };
 
-module.exports = {createPost, getAllPosts}
+
+
+const getPostBySlug = async(req,res) =>{
+  try {
+    const post = await Posts.findOne({ slug: req.params.slug }).populate("author", "name");
+    if (!post) return res.status(404).json({ message: "Post not found" });
+    res.status(200).json({ post });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching post", error });
+  }
+}
+
+module.exports = {createPost, getAllPosts,getPostBySlug}
