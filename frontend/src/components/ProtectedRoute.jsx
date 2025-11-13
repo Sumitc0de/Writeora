@@ -6,12 +6,17 @@ import { useAuth } from "../context/AuthContext";
 const ProtectedRoute = ({ children }) => {
   const { user, isLoggedIn, loading } = useAuth();
 
-  if (loading) return null;
+  // ⏳ While loading auth, show nothing but allow transitions to settle
+  if (loading) {
+    return <div className="min-h-screen bg-[#0F0D0A]" />; 
+  }
 
-  // ✅ Allow if logged in
-  if (user || isLoggedIn()) return children;
+  // 🔐 Allow when logged in
+  if (user || isLoggedIn()) {
+    return children;
+  }
 
-  // ❌ Redirect if not logged in
+  // 🚫 Redirect user to login (with replace)
   return <Navigate to="/login" replace />;
 };
 

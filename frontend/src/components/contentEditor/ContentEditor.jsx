@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import TemplateSelector from "./TemplateSelector";
 import Toolbar from "./Toolbar";
 import EditorArea from "./EditorArea";
@@ -6,31 +7,31 @@ import HashtagSection from "./HashtagSection";
 import AITools from "./AITools";
 import LivePreview from "./LivePreview";
 import { FilePlus, Upload, AlertCircle, CheckCircle2 } from "lucide-react";
-import { getAllPosts } from "../../service/postService";
-import { useAuth } from "../../context/AuthContext";
+import { getPostBySlug } from "../../service/postService";
 import { usePosts } from "../../context/PostContext";
 
 const ContentEditor = () => {
   const { postData, setPostData, publishPost } = usePosts();
   const editorRef = useRef(null);
-  const { user } = useAuth();
+  const navigate = useNavigate();
+
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishError, setPublishError] = useState("");
   const [publishSuccess, setPublishSuccess] = useState("");
 
-  // ✅ Log all posts once (for debugging)
-  useEffect(() => {
-    const fetchAndLog = async () => {
-      try {
-        const posts = await getAllPosts();
-        console.log("📦 All Posts from Backend:", posts);
-      } catch (err) {
-        console.error("❌ Failed to fetch posts:", err);
-      }
-    };
-    fetchAndLog();
-  }, []);
+  // // ✅ Log all posts once (for debugging)
+  // useEffect(() => {
+  //   const fetchAndLog = async () => {
+  //     try {
+  //       const posts = await getAllPosts();
+  //       console.log("📦 All Posts from Backend:", posts);
+  //     } catch (err) {
+  //       console.error("❌ Failed to fetch posts:", err);
+  //     }
+  //   };
+  //   fetchAndLog();
+  // }, []);
 
   // ✅ Load saved draft (if any)
   useEffect(() => {
@@ -45,6 +46,7 @@ const ContentEditor = () => {
       }
     }
   }, [setPostData]);
+  // console.log(postData)
 
   // ✅ Handle input changes
   const handleChange = (e) => {
@@ -103,6 +105,7 @@ const ContentEditor = () => {
       await publishPost(postData); // pass current data
       setPublishSuccess("🚀 Post published successfully!");
       localStorage.removeItem("draft"); // clear draft after publishing
+      navigate('/discover')
     } catch (err) {
       console.error("❌ Publish error:", err);
       setPublishError(
@@ -223,9 +226,9 @@ const ContentEditor = () => {
 
         {/* ===== Hashtags & Preview ===== */}
         <HashtagSection
-          hashtags={postData.hashtags || []}
-          setHashtags={(tags) => setPostData((p) => ({ ...p, hashtags: tags }))}
-        />
+  hashtags={postData.hashtags}
+  setHashtags={(tags) => setPostData((p) => ({ ...p, hashtags: tags }))}
+/>
         <LivePreview
           headerImage={postData.headerImage}
           title={postData.title}

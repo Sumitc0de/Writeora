@@ -4,24 +4,17 @@ import Button from "../src/components/Button";
 import { motion } from "framer-motion";
 import { useAuth } from "../src/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Home from "./Home"; // used only if you want inline render (not required for redirect)
 
 const LandingPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-
-  // // Redirect to discover/home when auth finished loading and user exists
-  // useEffect(() => {
-  //   if (!loading && user) {
-  //     navigate("/discover", { replace: true });
-  //   }
-  // }, [user, loading, navigate]);
-
   const handleClick = () => {
     if (!user) {
       navigate("/login");
     } else {
-      navigate("/discover");
+      navigate("/home", { replace: true });  // 👈 Correct redirect
     }
   };
 
@@ -60,8 +53,8 @@ const LandingPage = () => {
               <span className="relative z-10"> ✍️ Start Writing</span>
             </Button>
             <Button
-            onClick={()=> {navigate('/about')}}
-             className="border border-yellow-400 text-black hover:bg-yellow-600 px-7 py-3 rounded-lg text-lg transition">
+              onClick={() => { navigate('/about') }}
+              className="border border-yellow-400 text-black hover:bg-yellow-600 px-7 py-3 rounded-lg text-lg transition">
               🚀 Learn More
             </Button>
           </div>

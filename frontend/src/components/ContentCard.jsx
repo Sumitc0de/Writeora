@@ -1,16 +1,23 @@
 import React from "react";
 import { Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ContentCard = ({
   title,
   subtitle,
   time,
+  slug,
   author,
   category,
   image,
 }) => {
+  const navigate = useNavigate();
+
   return (
+
+
     <div
+      onClick={() => navigate(`/post/${slug}`)}
       className="group relative w-64 h-40 sm:w-80 sm:h-48 mt-6 cursor-pointer 
       rounded-2xl overflow-hidden from-[#1C1813] to-[#241F1A]
       border border-[#2D261F] transition-all duration-500 ease-out
@@ -30,7 +37,7 @@ const ContentCard = ({
           className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-all duration-500"
         />
         {/* Overlay for better text visibility */}
-      <div className="absolute inset-0 bg-linear-to-t from-[#241A13]/55 via-[#130F0B]/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-[#241A13]/55 via-[#130F0B]/20 to-transparent" />
 
 
         {/* Title over image */}
@@ -55,7 +62,7 @@ const ContentCard = ({
           <div className="flex items-center gap-1">
             <Clock size={12} /> {time}
           </div>
-          <span>By {author}</span>
+          <span>By {author?.name ?? "Unknown"}</span>
         </div>
       </div>
     </div>

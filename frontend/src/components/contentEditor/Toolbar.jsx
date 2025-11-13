@@ -99,6 +99,7 @@ const Toolbar = ({ editorRef }) => {
       <input
         type="file"
         accept="image/*"
+        name="contentImage"
         ref={fileInputRef}
         className="hidden"
         onChange={handleImageUpload}
