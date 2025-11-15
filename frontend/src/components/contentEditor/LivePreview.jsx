@@ -6,9 +6,9 @@ const LivePreview = ({ headerImage, title, subtitle, category, content }) => (
     <div className="bg-[#241F1A] p-6 rounded-xl">
       {headerImage && (
         <img
-          src={headerImage}
+          src={headerImage?.url}
           alt="preview"
-          className="w-full h-64 object-cover rounded-xl mb-4"
+          className="w-full h-[30vw] object-cover rounded-xl mb-4"
         />
       )}
       {category && <p className="text-sm text-gray-400">{category}</p>}

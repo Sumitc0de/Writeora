@@ -26,11 +26,8 @@ const Posts = () => {
     fetchPost();
   }, [slug]);
   
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
 
-  // ✅ Handle comments
+  // Handle comments
   const handleComment = () => {
     if (input.trim() === "") return;
     setComments((prev) => [...prev, { text: input, author: "You" }]);
@@ -82,9 +79,9 @@ const Posts = () => {
           {/* ===== Header Image ===== */}
           {post.headerImage && (
             <img
-              src={post.headerImage}
+              src={post.headerImage?.url}
               alt={post.title}
-              className="w-full h-72 object-cover rounded-2xl shadow-lg border border-[#2A2520]"
+              className="w-full h-[25vw]  object-cover rounded-2xl shadow-lg border border-[#2A2520]"
             />
           )}
         </div>

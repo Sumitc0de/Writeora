@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
 } from "react";
+
 import { useAuth } from "./AuthContext";
 import { getAllPosts, createPost } from "../service/postService";
 
@@ -18,47 +19,54 @@ export const PostProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // FIXED: headerImage SHOULD be an object
   const [postData, setPostData] = useState({
-    headerImage: "",
+    headerImage: {
+      public_id: "",
+      url: ""
+    },
     title: "",
     subtitle: "",
     category: "",
     content: "",
-    contentImage: [],
+    contentImages: [], // array of {public_id, url}
     hashtags: [],
   });
 
-  /**
-   * ✅ Fetch all posts
-   */
+  // Fetch posts
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getAllPosts();
-      setPosts(response.posts || response || []);
+      setPosts(response.posts || []);
     } catch (err) {
-      console.error("❌ Fetch posts error:", err);
       setError(err.response?.data?.message || "Failed to fetch posts");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  /**
-   * ✅ Create / Publish Post
-   * No manual token required — cookie is sent automatically
-   */
+  // FIXED: Publish Post
   const publishPost = useCallback(
     async (postPayload) => {
       if (!user) throw new Error("User not authenticated");
 
       const payload = {
-        title: postPayload?.title?.trim(),
-        subTitle: postPayload?.subtitle || "",
-        category: postPayload?.category || "General",
-        content: postPayload?.content,
-        headerImage: postPayload?.headerImage || "",
-        hashtags: postPayload?.hashtags || [],
+        title: postPayload.title?.trim(),
+        subtitle: postPayload.subtitle || "",
+        category: postPayload.category || "General",
+        content: postPayload.content,
+
+        // FIXED: Send object, not string
+        headerImage: {
+          public_id: postPayload.headerImage?.public_id || "",
+          url: postPayload.headerImage?.url || ""
+        },
+
+        hashtags: postPayload.hashtags || [],
+
+        // FIXED: Send array of objects
+        contentImages: postPayload.contentImages || [],
       };
 
       if (!payload.title || !payload.content) {
@@ -67,40 +75,36 @@ export const PostProvider = ({ children }) => {
 
       try {
         const data = await createPost(payload);
-        console.log("✅ Post created:", data);
 
         setPosts((prev) => [data.post || data, ...prev]);
 
-        // Reset editor state
+        // Reset AFTER publish
         setPostData({
-          headerImage: "",
+          headerImage: {
+            public_id: "",
+            url: ""
+          },
           title: "",
           subtitle: "",
           category: "",
           content: "",
-          contentImage: [],
+          contentImages: [],
           hashtags: [],
         });
 
         return data;
       } catch (err) {
-        console.error("❌ Publish post error:", err);
+        console.error("Publish error:", err);
         throw err;
       }
     },
     [user]
   );
 
-  /**
-   * ✅ Fetch posts when component mounts
-   */
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
 
-  /**
-   * ✅ Memoized context value
-   */
   const value = useMemo(
     () => ({
       posts,
@@ -119,12 +123,8 @@ export const PostProvider = ({ children }) => {
   );
 };
 
-/**
- * ✅ Safe custom hook for using PostContext
- */
 export const usePosts = () => {
   const context = useContext(PostContext);
-  if (!context)
-    throw new Error("usePosts must be used within a PostProvider");
+  if (!context) throw new Error("usePosts must be inside PostProvider");
   return context;
 };

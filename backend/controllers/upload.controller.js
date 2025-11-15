@@ -10,6 +10,7 @@ exports.uploadImage = async (req, res) => {
       success: true,
       message: "Image uploaded successfully",
       imageUrl: result.secure_url,
+      public_id:result.public_id
     });
   } catch (error) {
     console.error(error);

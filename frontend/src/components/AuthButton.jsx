@@ -1,7 +1,7 @@
 // ✅ Reusable component for login/signup buttons
 import Button from "./Button";
 
-const AuthButton = ({ handleLogin, navigate }) => (
+const AuthButton = ({ handleLogin, handleSignup }) => (
   <div className="flex items-center gap-4">
     <Button
       onClick={handleLogin}

@@ -9,10 +9,11 @@ const ContentCard = ({
   slug,
   author,
   category,
-  image,
+  headerImage,
 }) => {
   const navigate = useNavigate();
 
+  // console.log(headerImage)
   return (
 
 
@@ -32,7 +33,7 @@ const ContentCard = ({
       {/* 🔹 Image + Title overlay */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center h-full">
         <img
-          src={image}
+          src={headerImage?.url}
           alt={title}
           className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-all duration-500"
         />

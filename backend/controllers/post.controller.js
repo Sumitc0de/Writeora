@@ -1,30 +1,47 @@
 const Posts = require("../models/posts.model");
 
-
-
 const createPost = async (req, res) => {
-    try {
-        const { title, subtitle, category, content, hashtags, contentImage } = req.body;
+  try {
+    const {
+      title,
+      subtitle,
+      category,
+      content,
+      headerImage,
+      hashtags,
+      contentImages, // 👈 FIXED (was contentImage)
+      slug
+    } = req.body;
 
-        const newPost = await Posts.create({
-            author: req.user.id,
-            title,
-            subtitle,
-            // headerImage,
-            category,
-            content,
-            hashtags,
-            contentImage
-        })
+    // Debug logs
+    console.log("📥 Received headerImage:", headerImage);
+    console.log("📸 Received contentImages:", contentImages);
 
-        res.status(201).json({
-            success: true,
-            post: newPost
-        })
-    } catch (error) {
-         res.status(500).json({ success: false, message: error.message });
-    }
-}
+    const newPost = await Posts.create({
+      author: req.user?.id, // 👈 prevent crash if user missing
+      title,
+      subtitle,
+      headerImage,      // 👈 this works now
+      category,
+      content,
+      hashtags,
+      contentImages,    // 👈 fixed field
+      slug
+    });
+
+    res.status(201).json({
+      success: true,
+      post: newPost
+    });
+
+  } catch (error) {
+    console.error("❌ Create Post Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 
 const getAllPosts = async (req, res) => {
   try {

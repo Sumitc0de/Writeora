@@ -50,11 +50,20 @@ try{
   }
 
 
+  const handleSignup = () =>{
+    if(!user){
+      navigate("/signup");
+    }else{
+      navigate("/discover");
+    }
+  }
+
   const isHomed = location.pathname === '/';
   const isLoggedIn = !!user;
 
   const Navigations = [
     { name: "Discover", route: "/discover" },
+    { name: "Write", route: "/create" },
     { name: "Learn", route: "/learn" },
     { name: "About", route: "/about" },
     { name: "Contact Us", route: "/contact-us" },
@@ -70,7 +79,7 @@ try{
       </div>
 
       {/* ✅ Navigation Links (only visible when logged in) */}
-      {user && location.pathname == '/discover' &&(
+      {user && location.pathname !== '/' &&(
         <nav className="hidden md:flex items-center gap-6">
           {Navigations.map((n) => {
             const isActive = location.pathname === n.route;
@@ -97,7 +106,7 @@ try{
 <div className="flex items-center gap-4">
   {isHomed ? (
     // 🏠 Landing Page → Always show login & signup buttons
-    <AuthButton handleLogin={handleLogin} navigate={navigate} />
+    <AuthButton handleLogin={handleLogin} handleSignup={handleSignup} />
   ) : isLoggedIn ? (
     // 👤 Not on home page → user logged in → show profile dropdown
     <div ref={dropdownRef} className="relative">
@@ -164,7 +173,7 @@ try{
     </div>
   ) : (
     // ❌ Not on home page → user not logged in → show login & signup
-    <AuthButton handleLogin={handleLogin} navigate={navigate} />
+    <AuthButton handleLogin={handleLogin} handleSignup={handleSignup} />
   )}
 </div>
 

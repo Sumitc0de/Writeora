@@ -14,64 +14,64 @@ const LandingPage = () => {
     if (!user) {
       navigate("/login");
     } else {
-      navigate("/home", { replace: true });  // 👈 Correct redirect
+      navigate("/discover", { replace: true });  // 👈 Correct redirect
     }
   };
 
   return (
     <div className="bg-[#0F0D0A] text-white min-h-screen overflow-hidden">
       {/* 🦾 Hero Section */}
-      <section className="min-h-screen flex flex-col md:flex-row items-center justify-between lg:px-28 md:px-20 py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="max-w-xl text-center md:text-left"
-        >
-          <h1 className="text-7xl font-extrabold leading-tight mb-5">
-            Write Smarter. <br />
-            Learn Together. <br />
-            <span className="text-yellow-500 text-5xl">Welcome to Writeora.</span>
-          </h1>
-          <p className="text-gray-400 text-lg mb-8 leading-relaxed">
-            Writeora is your AI-powered creative workspace — built for{" "}
-            <strong>writers</strong>, <strong>learners</strong>, and{" "}
-            <strong>educators</strong>. Turn ideas into beautiful blogs, guides,
-            and stories — faster than ever before.
-          </p>
+       <section className="h-[90vh] flex flex-col items-center justify-center text-center px-6 mt-10 lg:px-20">
+        <h1 className="text-5xl md:text-6xl font-semibold leading-tight mb-4">
+          Turn Your Knowledge into Impact.
+          <br />
+          <span className="text-[#F5C542] text-3xl">
+            Create, Learn & Grow with AI.
+          </span>
+        </h1>
 
-          <div className="flex justify-center md:justify-start gap-4">
-            <Button
-              onClick={handleClick}
-              className="relative px-7 py-2.5 rounded-lg font-semibold text-black 
-                 bg-linear-to-r from-yellow-500 to-yellow-400 
-                 border border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.5)] 
-                 hover:shadow-[0_0_30px_rgba(234,179,8,0.8)] 
-                 hover:scale-105 transition-all duration-300"
-            >
-              <span className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.2),transparent_40%)] animate-pulse"></span>
-              <span className="relative z-10"> ✍️ Start Writing</span>
-            </Button>
-            <Button
-              onClick={() => { navigate('/about') }}
-              className="border border-yellow-400 text-black hover:bg-yellow-600 px-7 py-3 rounded-lg text-lg transition">
-              🚀 Learn More
-            </Button>
+          <Button
+          onClick={handleClick} className="relative px-8 py-3 rounded-xl font-semibold text-black bg-linear-to-r from-yellow-500 to-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)] hover:shadow-[0_0_25px_rgba(234,179,8,0.6)] hover:scale-105 transition-all duration-300">
+            <span className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.25),transparent_40%)] animate-pulse"></span>
+            <span className="relative z-10 flex items-center gap-2">
+              <Sparkles />   Create Something Epic
+            </span>
+          </Button>
+       
+
+
+
+
+        <p className="text-lg text-gray-300 mt-4 max-w-2xl mx-auto">
+          Welcome back to{" "}
+          <span className="text-[#F5C542] font-medium">Writeora</span> — your
+          creative space where ideas become reality. Start writing, exploring,
+          or learning with AI by your side.
+        </p>
+
+        {/* Quick Access Cards */}
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl">
+          <div className="bg-[#1C1813] hover:bg-[#241F1A] transition-all duration-300 p-6 rounded-2xl border border-[#2A2520]">
+            <h3 className="text-xl font-semibold text-[#F5C542] mb-2">Create</h3>
+            <p className="text-gray-400">
+              Start writing articles, blogs, or reports powered by AI assistance.
+            </p>
           </div>
-        </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="mt-12 md:mt-0"
-        >
-          <img
-            src="/writeora-hero.png"
-            alt="AI Writing Platform Illustration"
-            className="w-[420px] md:w-[520px] drop-shadow-2xl rounded-2xl"
-          />
-        </motion.div>
+          <div className="bg-[#1C1813] hover:bg-[#241F1A] transition-all duration-300 p-6 rounded-2xl border border-[#2A2520]">
+            <h3 className="text-xl font-semibold text-[#F5C542] mb-2">Learn</h3>
+            <p className="text-gray-400">
+              Explore new techniques, trends, and case studies curated for you.
+            </p>
+          </div>
+
+          <div className="bg-[#1C1813] hover:bg-[#241F1A] transition-all duration-300 p-6 rounded-2xl border border-[#2A2520]">
+            <h3 className="text-xl font-semibold text-[#F5C542] mb-2">Grow</h3>
+            <p className="text-gray-400">
+              Build your content portfolio and showcase your AI-powered creativity.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* 🧠 Features Section */}
