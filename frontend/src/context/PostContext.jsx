@@ -47,59 +47,51 @@ export const PostProvider = ({ children }) => {
   }, []);
 
   // FIXED: Publish Post
-  const publishPost = useCallback(
-    async (postPayload) => {
-      if (!user) throw new Error("User not authenticated");
+ const publishPost = useCallback(
+  async (postPayload) => {
+    if (!user) throw new Error("User not authenticated");
 
-      const payload = {
-        title: postPayload.title?.trim(),
-        subtitle: postPayload.subtitle || "",
-        category: postPayload.category || "General",
-        content: postPayload.content,
+    const payload = {
+      title: postPayload.title?.trim(),
+      subtitle: postPayload.subtitle || "",
+      category: postPayload.category || "General",
+      content: postPayload.content,
+      headerImage: {
+        public_id: postPayload.headerImage?.public_id || "",
+        url: postPayload.headerImage?.url || ""
+      },
+      hashtags: postPayload.hashtags || [],
+      contentImages: postPayload.contentImages || [],
+    };
 
-        // FIXED: Send object, not string
-        headerImage: {
-          public_id: postPayload.headerImage?.public_id || "",
-          url: postPayload.headerImage?.url || ""
-        },
+    if (!payload.title || !payload.content) {
+      throw new Error("Title and content are required");
+    }
 
-        hashtags: postPayload.hashtags || [],
+    try {
+      await createPost(payload);
 
-        // FIXED: Send array of objects
-        contentImages: postPayload.contentImages || [],
-      };
+      // 🚀 100% FIX: re-fetch posts so author is populated
+      await fetchPosts();
 
-      if (!payload.title || !payload.content) {
-        throw new Error("Title and content are required");
-      }
+      // Reset form
+      setPostData({
+        headerImage: { public_id: "", url: "" },
+        title: "",
+        subtitle: "",
+        category: "",
+        content: "",
+        contentImages: [],
+        hashtags: [],
+      });
 
-      try {
-        const data = await createPost(payload);
-
-        setPosts((prev) => [data.post || data, ...prev]);
-
-        // Reset AFTER publish
-        setPostData({
-          headerImage: {
-            public_id: "",
-            url: ""
-          },
-          title: "",
-          subtitle: "",
-          category: "",
-          content: "",
-          contentImages: [],
-          hashtags: [],
-        });
-
-        return data;
-      } catch (err) {
-        console.error("Publish error:", err);
-        throw err;
-      }
-    },
-    [user]
-  );
+    } catch (err) {
+      console.error("Publish error:", err);
+      throw err;
+    }
+  },
+  [user, fetchPosts]
+);
 
   useEffect(() => {
     fetchPosts();

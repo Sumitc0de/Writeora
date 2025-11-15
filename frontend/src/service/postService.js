@@ -27,3 +27,10 @@ export const getPostBySlug = async (slug) => {
   });
   return data;
 }
+
+export const getPostByCategory = async (category)=>{
+  const { data } = await axios.get(`http://localhost:8000/api/posts/category/${category}`, {
+    withCredentials: true,
+  });
+  return data;
+}

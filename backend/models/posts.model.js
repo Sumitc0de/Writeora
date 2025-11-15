@@ -40,12 +40,12 @@ const postSchema = mongoose.Schema({
         url: { type: String },
     },
 
-    contentImages: [
-        {
-            public_id: { type: String },
-            url: { type: String },
-        }
-    ],
+    // contentImages: [
+    //     {
+    //         public_id: { type: String },
+    //         url: { type: String },
+    //     }
+    // ],
 
     content: {
         type: String,
@@ -128,7 +128,8 @@ const postSchema = mongoose.Schema({
         }
     ],
 },
-    { timestaps: true })
+    { timestamps: true }
+)
 
 
 // Create slug automatically if not provided
@@ -147,6 +148,7 @@ postSchema.pre("save", function (next) {
 // Respective Author of the post
 postSchema.post("save", async function (doc) {
   try {
+    // Find the Author id from doc and push to model
     await User.findByIdAndUpdate(doc.author, {
       $push: { posts: doc._id }
     });

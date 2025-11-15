@@ -3,7 +3,8 @@ const router = express.Router();
 const {
   createPost,
   getAllPosts,
-  getPostBySlug
+  getPostBySlug,
+  getPostByCategory
 } = require("../controllers/post.controller");
 const protect = require("../middlewares/authmiddleware")
 
@@ -13,7 +14,7 @@ router.get("/:slug",getPostBySlug );
 
 // ✅ Protected
 router.post("/", protect, createPost);
-// router.put("/:id", protect, updatePost);
+router.get("/category/:category", protect, getPostByCategory);
 // router.delete("/:id", protect, deletePost);
 
 // router.post("/like/:id", protect, toggleLike);

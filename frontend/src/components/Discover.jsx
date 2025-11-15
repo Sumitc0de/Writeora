@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Search, Loader } from "lucide-react";
 import ContentCard from "./ContentCard";
 import { usePosts } from "../context/PostContext";
+import { useNavigate } from "react-router-dom";
+import { getPostByCategory } from "../service/postService";
 
 const categories = [
   "All",
@@ -12,17 +14,21 @@ const categories = [
   "Marketing",
 ];
 
-const POSTS_PER_PAGE = 3;
+const POSTS_PER_PAGE = 9;
 
 export default function DiscoverSection() {
+  const navigate = useNavigate();
   const { posts, loading } = usePosts();
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [categoryPosts, setCategoryPosts] = useState([]);
+
 
   // Filter posts by category
-  const filteredPosts = selectedCategory === "All"
-    ? posts
-    : posts.filter(post => post.category === selectedCategory);
+const filteredPosts = selectedCategory === "All"
+  ? posts
+  : categoryPosts;
+
 
   const visiblePosts = filteredPosts.slice(0, visibleCount);
   const hasMorePosts = visibleCount < filteredPosts.length;
@@ -55,11 +61,26 @@ export default function DiscoverSection() {
   };
 
   // Handle category filter
-  const handleCategoryClick = (category) => {
-    setSelectedCategory(category);
-    setVisibleCount(POSTS_PER_PAGE); // Reset to initial count when filtering
-    sessionStorage.setItem("selectedCategory", category);
-  };
+  const handleCategoryClick = async (category) => {
+  setSelectedCategory(category);
+  setVisibleCount(POSTS_PER_PAGE);
+  sessionStorage.setItem("selectedCategory", category);
+
+  // If user selects "All", reset results
+  if (category === "All") {
+    setCategoryPosts([]);
+    return;
+  }
+
+  // Get category posts
+  try {
+    const res = await getPostByCategory(category);
+    setCategoryPosts(res.posts || []);
+  } catch (err) {
+    console.log("Category fetch error:", err);
+    setCategoryPosts([]); // fallback
+  }
+};
 
   return (
     <div className="w-full min-h-screen mt-15 bg-[#130F0B] text-white flex px-4 md:px-28  gap-6 md:gap-10 py-8">

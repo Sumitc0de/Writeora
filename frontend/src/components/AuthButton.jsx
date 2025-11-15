@@ -15,7 +15,7 @@ const AuthButton = ({ handleLogin, handleSignup }) => (
     </Button>
 
     <Button
-      onClick={() => navigate('/signup')}
+      onClick={handleSignup}
       className="relative px-7 py-2.5 rounded-lg font-semibold text-black 
                  bg-linear-to-r from-yellow-500 to-yellow-400 
                  border border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.5)] 

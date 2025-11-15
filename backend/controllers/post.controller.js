@@ -9,7 +9,6 @@ const createPost = async (req, res) => {
       content,
       headerImage,
       hashtags,
-      contentImages, // 👈 FIXED (was contentImage)
       slug
     } = req.body;
 
@@ -21,11 +20,10 @@ const createPost = async (req, res) => {
       author: req.user?._id, // 👈 prevent crash if user missing
       title,
       subtitle,
-      headerImage,      // 👈 this works now
+      headerImage,    
       category,
       content,
       hashtags,
-      contentImages,    // 👈 fixed field
       slug
     });
 
@@ -46,8 +44,9 @@ const createPost = async (req, res) => {
 const getAllPosts = async (req, res) => {
   try {
     const posts = await Posts.find({})
+      .sort({ createdAt: -1 })
       .populate("author", "name email")
-      .sort({ createdAt: -1 });
+      .lean();
 
     res.status(200).json({ success: true, posts });
   } catch (error) {
@@ -67,5 +66,23 @@ const getPostBySlug = async(req,res) =>{
   }
 }
 
+const getPostByCategory = async (req,res)=>{
+try {
+  const posts = await Posts.find({ category: req.params.category })
+    .sort({ createdAt: -1 })
+    .populate("author", "name email")
+    .lean();
 
-module.exports = {createPost, getAllPosts,getPostBySlug}
+  if (!posts || posts.length === 0) {
+    return res.status(404).json({ message: "No posts found for this category" });
+  }
+
+  res.status(200).json({ success: true, posts });
+} catch (error) {
+    res.status(500).json({ message: "Error fetching post", error });
+  
+}
+}
+
+
+module.exports = {createPost, getAllPosts,getPostBySlug,getPostByCategory}

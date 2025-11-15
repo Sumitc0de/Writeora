@@ -124,7 +124,7 @@ try{
           className="w-8 h-8 rounded-full"
         />
         <span className="font-medium text-yellow-400">
-          {user?.user?.name || "User"}
+          {user?.name || "User"}
         </span>
 
         <svg

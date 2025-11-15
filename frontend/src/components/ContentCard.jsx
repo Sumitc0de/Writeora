@@ -14,6 +14,7 @@ const ContentCard = ({
   const navigate = useNavigate();
 
   // console.log(headerImage)
+  // console.log(author.name)
   return (
 
 
@@ -33,7 +34,7 @@ const ContentCard = ({
       {/* 🔹 Image + Title overlay */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center h-full">
         <img
-          src={headerImage?.url}
+          src={headerImage?.url || null}
           alt={title}
           className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-all duration-500"
         />
@@ -63,7 +64,8 @@ const ContentCard = ({
           <div className="flex items-center gap-1">
             <Clock size={12} /> {time}
           </div>
-          <span>By {author?.name ?? "Unknown"}</span>
+         <span>By {author?.name || "..."}</span>
+
         </div>
       </div>
     </div>

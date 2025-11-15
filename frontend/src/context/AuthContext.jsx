@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = async () => {
     try {
       const { data } = await axios.get("/user/profile");
-      setUser(data); // ✅ Backend sends the user directly (not data.user)
+      setUser(data.user); // ✅ Backend sends the user directly (not data.user)
       setError(null);
     } catch (err) {
       setUser(null);
@@ -34,9 +34,9 @@ export const AuthProvider = ({ children }) => {
     fetchUser(); // run once when app mounts
   }, []);
 
-  /**
-   * 🧩 Login Handler
-   */
+ 
+  // 🧩 Login Handler
+
   const login = async (email, password) => {
     try {
       const { data } = await axios.post("/user/login", { email, password });
@@ -49,9 +49,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * 🚪 Logout Handler
-   */
+  //  🚪 Logout Handler
+
   const logout = async () => {
     try {
       await axios.post("/user/logout");
@@ -64,9 +63,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * 🔐 Check if user is logged in (based on token cookie)
-   */
+//  🔐 Check if user is logged in (based on token cookie)
+
   const isLoggedIn = () => {
     const token = Cookies.get("token");
     return Boolean(token);
@@ -90,7 +88,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-/**
- * 🪄 Custom Hook
- */
+// Custom Auth Hook
 export const useAuth = () => useContext(AuthContext);

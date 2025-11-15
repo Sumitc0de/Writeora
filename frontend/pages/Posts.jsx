@@ -10,7 +10,7 @@ const Posts = () => {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  console.log(post)
+  // console.log(post)
   // ✅ Fetch post by slug
   useEffect(() => {
     const fetchPost = async () => {
