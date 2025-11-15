@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const User = require('./users.model')
 
 const postSchema = mongoose.Schema({
 
@@ -141,6 +142,19 @@ postSchema.pre("save", function (next) {
     }
     next();
 });
+
+
+// Respective Author of the post
+postSchema.post("save", async function (doc) {
+  try {
+    await User.findByIdAndUpdate(doc.author, {
+      $push: { posts: doc._id }
+    });
+  } catch (err) {
+    console.error("Error updating user's posts:", err);
+  }
+});
+
 
 const Posts = mongoose.models.Posts || mongoose.model("Posts", postSchema);
 module.exports = Posts;

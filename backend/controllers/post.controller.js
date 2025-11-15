@@ -14,11 +14,11 @@ const createPost = async (req, res) => {
     } = req.body;
 
     // Debug logs
-    console.log("📥 Received headerImage:", headerImage);
-    console.log("📸 Received contentImages:", contentImages);
+    // console.log("📥 Received headerImage:", headerImage);
+    // console.log("📸 Received contentImages:", contentImages);
 
     const newPost = await Posts.create({
-      author: req.user?.id, // 👈 prevent crash if user missing
+      author: req.user?._id, // 👈 prevent crash if user missing
       title,
       subtitle,
       headerImage,      // 👈 this works now
@@ -66,5 +66,6 @@ const getPostBySlug = async(req,res) =>{
     res.status(500).json({ message: "Error fetching post", error });
   }
 }
+
 
 module.exports = {createPost, getAllPosts,getPostBySlug}
