@@ -158,5 +158,6 @@ postSchema.post("save", async function (doc) {
 });
 
 
+// Create post model if not exist
 const Posts = mongoose.models.Posts || mongoose.model("Posts", postSchema);
 module.exports = Posts;

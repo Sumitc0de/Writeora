@@ -63,9 +63,13 @@ userSchema.pre("save", async function (next) {
     next();
 })
 
+// Creating matchPassword for comparing the hashedPassword with userPassword
 userSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 }
 
+//Checking if User model exists then save to them else create new User model in database
 const User = mongoose.models.User || mongoose.model("User", userSchema);
+
+// Exporting the User model
 module.exports = User;

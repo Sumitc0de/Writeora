@@ -1,10 +1,14 @@
+// Import the cloudinary v2 client
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 
+// Configure with your Cloudinary credentials
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+
+// Export the module
 module.exports = cloudinary;
