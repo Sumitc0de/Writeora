@@ -22,15 +22,12 @@ export const createPost = async (postData) => {
 
 
 export const getPostBySlug = async (slug) => {
-  const { data } = await axios.get(`http://localhost:8000/api/posts/${slug}`, {
-    withCredentials: true,
-  });
+  const { data } = await api.get(`/posts/${slug}`);
   return data;
 }
 
 export const getPostByCategory = async (category)=>{
-  const { data } = await axios.get(`http://localhost:8000/api/posts/category/${category}`, {
-    withCredentials: true,
-  });
+  const { data } = await api.get(`/posts/category/${encodeURIComponent(category)}`);
   return data;
 }
+

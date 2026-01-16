@@ -16,13 +16,13 @@ const HashtagSection = ({ hashtags = [], setHashtags }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-8 bg-[#1C1813] border border-[#2A2520] p-5 rounded-xl">
+    <div className="max-w-full mx-auto mt-8 bg-[#1C1813] border border-[#2A2520] p-5 rounded-xl">
       <h3 className="flex items-center gap-2 text-yellow-500 text-lg font-semibold mb-3">
         <Hash className="w-5 h-5" /> Add Hashtags
       </h3>
 
       {/* Input */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -32,7 +32,7 @@ const HashtagSection = ({ hashtags = [], setHashtags }) => {
         />
         <button
           onClick={addHashtag}
-          className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-black rounded-md transition-all font-medium"
+          className="px-4 py-2 w-full sm:w-fit bg-yellow-600 hover:bg-yellow-500 text-black rounded-md transition-all font-medium"
         >
           Add
         </button>

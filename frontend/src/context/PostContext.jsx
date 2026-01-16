@@ -29,8 +29,8 @@ export const PostProvider = ({ children }) => {
     subtitle: "",
     category: "",
     content: "",
-    contentImages: [], // array of {public_id, url}
     hashtags: [],
+    readingTime: 1
   });
 
   // Fetch posts
@@ -62,6 +62,7 @@ export const PostProvider = ({ children }) => {
       },
       hashtags: postPayload.hashtags || [],
       contentImages: postPayload.contentImages || [],
+      readingTime: postPayload.readingTime || 1
     };
 
     if (!payload.title || !payload.content) {
@@ -81,8 +82,8 @@ export const PostProvider = ({ children }) => {
         subtitle: "",
         category: "",
         content: "",
-        contentImages: [],
         hashtags: [],
+        readingTime:1
       });
 
     } catch (err) {

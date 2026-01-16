@@ -11,12 +11,14 @@ import LivePreview from "./LivePreview";
 import { FilePlus, Upload, AlertCircle, CheckCircle2, Loader } from "lucide-react";
 import { uploadImage } from "../../service/uploadImage";
 import { usePosts } from "../../context/PostContext";
+import { calculateReadTime } from "../../service/calculateReadTime";
 
 const ContentEditor = () => {
 
   const { postData, setPostData, publishPost } = usePosts();
   const editorRef = useRef(null);
   const navigate = useNavigate();
+
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [isUploadingHeader, setIsUploadingHeader] = useState(false);
@@ -88,27 +90,7 @@ const ContentEditor = () => {
     setIsUploadingHeader(false);
   };
 
-  // ------------------------------------------------------------------
-  // ✅ Content Image Upload 
-  // ------------------------------------------------------------------
-  const handleContentImageUpload = async (file) => {
-    if (!file) return;
 
-    try {
-      const imageUrl = await uploadImage(file);
-
-      const imageTag = `\n<img src="${imageUrl}" alt="img" style="max-width:100%;border-radius:12px;margin:12px 0;" />\n`;
-
-      setPostData((prev) => ({
-        ...prev,
-        content: prev.content + imageTag,
-        contentImages: [...(prev.contentImages || []), imageUrl],
-      }));
-
-    } catch (err) {
-      console.error("Content image error:", err);
-    }
-  };
 
   // ------------------------------------------------------------------
   // ✅ Save Draft Manually
@@ -133,12 +115,16 @@ const ContentEditor = () => {
 
     if (!postData.title?.trim()) return setPublishError("Title required");
     if (!postData.content?.trim()) return setPublishError("Content required");
-    if (!postData.category?.trim()) return setPublishError("Category required");
 
     setIsPublishing(true);
 
     try {
-      await publishPost(postData);
+      const readTime = calculateReadTime(postData.content)
+       const updatedPost = {
+    ...postData,
+    readingTime: readTime,
+  };
+      await publishPost(updatedPost);
 
       localStorage.removeItem("draft");
       setPublishSuccess("🚀 Post published!");
@@ -153,10 +139,10 @@ const ContentEditor = () => {
     setIsPublishing(false);
   };
 
-  console.log("FINAL POST DATA →", postData);
+  // console.log("FINAL POST DATA →", postData);
 
   return (
-    <div className="min-h-screen pt-24 bg-[#130F0B] text-gray-100 p-8">
+    <div className="min-h-screen pt-24 bg-[#0C0A07] text-gray-100 p-8">
       <div className="max-w-6xl mx-auto space-y-6">
 
         {/* Alerts */}
@@ -172,6 +158,7 @@ const ContentEditor = () => {
           </div>
         )}
 
+        <div>
         {/* Template Selector */}
         <TemplateSelector
           template={postData.template}
@@ -182,6 +169,28 @@ const ContentEditor = () => {
           setContent={(c) => setPostData((p) => ({ ...p, content: c }))}
         />
 
+        {/* Buttons */}
+        <div className="flex justify-end gap-4">
+          <button
+            onClick={handleSaveDraft}
+            className="bg-yellow-600 px-5 py-2 rounded-lg flex items-center gap-2"
+          >
+            <FilePlus size={18} /> Save Draft
+          </button>
+
+          <button
+            onClick={handlePublish}
+            disabled={isPublishing || isUploadingHeader}
+            className={`bg-blue-600 px-5 py-2 rounded-lg flex items-center gap-2 ${(isPublishing || isUploadingHeader) && "opacity-50"
+              }`}
+          >
+            <Upload size={18} />
+            {isPublishing ? "Publishing..." : "Publish"}
+          </button>
+        </div>
+    </div>
+        
+
         {/* Header Image */}
         <div className="relative group">
 
@@ -189,10 +198,10 @@ const ContentEditor = () => {
             <img
               src={postData.headerImage.url}
               alt="Header"
-              className="w-full h-[30vw] object-cover rounded-2xl shadow-lg"
+              className="w-full h-[25vw] object-cover rounded-2xl shadow-lg"
             />
           ) : (
-            <div className="h-[30vw] w-full flex items-center justify-center bg-[#241F1A] rounded-2xl border-2 border-dashed border-[#2A2520]">
+            <div className="h-[25vw] w-full flex items-center justify-center bg-[#241F1A] rounded-2xl border-2 border-dashed border-[#2A2520]">
               🖼 Header Image Preview
             </div>
           )}
@@ -249,46 +258,28 @@ const ContentEditor = () => {
           className="bg-[#241F1A] px-3 py-2 rounded-md w-60 focus:ring-2 focus:ring-yellow-500"
         />
 
+         <AITools
+          content={postData.content}
+          setContent={(c) => setPostData((p) => ({ ...p, content: c }))}
+        />
+
         {/* Editor */}
-        <Toolbar editorRef={editorRef} onImageUpload={handleContentImageUpload} />
+        <Toolbar editorRef={editorRef} />
 
         <EditorArea
           editorRef={editorRef}
           content={postData.content}
           setContent={(c) => setPostData((p) => ({ ...p, content: c }))}
         />
-
-        <AITools
-          content={postData.content}
-          setContent={(c) => setPostData((p) => ({ ...p, content: c }))}
-        />
-
+       
         <HashtagSection
           hashtags={postData.hashtags || []}
           setHashtags={(tags) => setPostData((p) => ({ ...p, hashtags: tags }))}
         />
 
-        <LivePreview {...postData} />
+        {/* <LivePreview {...postData} /> */}
 
-        {/* Buttons */}
-        <div className="flex justify-end gap-4 pb-10 pt-5">
-          <button
-            onClick={handleSaveDraft}
-            className="bg-yellow-600 px-5 py-2 rounded-lg flex items-center gap-2"
-          >
-            <FilePlus size={18} /> Save Draft
-          </button>
-
-          <button
-            onClick={handlePublish}
-            disabled={isPublishing || isUploadingHeader}
-            className={`bg-blue-600 px-5 py-2 rounded-lg flex items-center gap-2 ${(isPublishing || isUploadingHeader) && "opacity-50"
-              }`}
-          >
-            <Upload size={18} />
-            {isPublishing ? "Publishing..." : "Publish"}
-          </button>
-        </div>
+        
       </div>
     </div>
   );

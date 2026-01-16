@@ -2,18 +2,28 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthButton from "../AuthButton";
 import { useAuth } from "../../context/AuthContext";
+import { Menu, X, ChevronDown } from "lucide-react"; // ✅ added 
 
 
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout, login } = useAuth();
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const { user, logout } = useAuth();
 
-  // console.log(user)
+  const [open, setOpen] = useState(false);          // profile dropdown
+  const [mobileMenu, setMobileMenu] = useState(false); // ✅ mobile nav
+  const dropdownRef = useRef(null);   // Dropdown refference
+  const arrowDirectionRef = useRef();  // arrow refference 
 
-  // ✅ Close dropdown on outside click
+  // DropDown user profile
+  useEffect(() => {
+    if (arrowDirectionRef.current) {
+      arrowDirectionRef.current.style.transform = open ? "rotate(180deg)" : "rotate(0deg)";
+      arrowDirectionRef.current.style.transition = "transform 0.3s ease";
+    }
+  }, [open]);
+
+  /* ---------------- CLOSE DROPDOWNS ON OUTSIDE CLICK ---------------- */
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -25,40 +35,31 @@ function Header() {
   }, []);
 
 
-
-  // ✅ Logout + redirect to landing page
+  // Handle logout
   const handleLogout = async () => {
     try {
-      await logout();      // Clears token + user
-      setOpen(false);      // Close dropdown
-
+      await logout();
+      setOpen(false);
+      setMobileMenu(false);
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
 
-  const handleLogin = async ()=>{
-try{
-  if(!user){
+
+  // Handle Login, redirect to /login route
+  const handleLogin = () => {
     navigate("/login");
-  }else{
-    navigate('/discover');
-  }
-}catch(err){
-  console.error("LogIn failed:", err)
-}
-  }
+  };
 
 
-  const handleSignup = () =>{
-    if(!user){
-      navigate("/signup");
-    }else{
-      navigate("/discover");
-    }
-  }
+  // Handle SignUp, redirect to /signup route
+  const handleSignup = () => {
+    navigate("/signup");
+  };
 
-  const isHomed = location.pathname === '/';
+  // Home route and checking for loggedIn User 
+  const isHomed = location.pathname === "/";
   const isLoggedIn = !!user;
 
   const Navigations = [
@@ -70,16 +71,17 @@ try{
   ];
 
   return (
-    <header className="w-full z-50 fixed top-0 h-20 backdrop-blur-md bg-[#130F0B] flex items-center justify-between px-6 lg:px-28 transition-colors duration-300">
-      {/* ✅ Logo */}
-      <div className="text-4xl font-bold text-white">
+    <header className="fixed top-0 z-50 w-full h-20 backdrop-blur-md bg-[#130F0B] border-b border-[#c9c1c15c] flex items-center justify-between px-6 lg:px-28">
+      
+      {/* LOGO */}
+      <div className="text-2xl md:text-3xl font-bold text-white">
         <Link to="/">
           Write<span className="text-yellow-500">ora.</span>
         </Link>
       </div>
 
-      {/* ✅ Navigation Links (only visible when logged in) */}
-      {user && location.pathname !== '/' &&(
+      {/* DESKTOP NAV */}
+      {user && location.pathname !== "/" && (
         <nav className="hidden md:flex items-center gap-6">
           {Navigations.map((n) => {
             const isActive = location.pathname === n.route;
@@ -87,7 +89,7 @@ try{
               <Link
                 key={n.route}
                 to={n.route}
-                className={`transition-colors text-lg duration-200 ${
+                className={`text-lg transition ${
                   isActive
                     ? "text-yellow-500 font-semibold"
                     : "text-gray-300 hover:text-yellow-400"
@@ -100,83 +102,102 @@ try{
         </nav>
       )}
 
-
-
-      {/* ✅ Auth Section */}
-<div className="flex items-center gap-4">
-  {isHomed ? (
-    // 🏠 Landing Page → Always show login & signup buttons
-    <AuthButton handleLogin={handleLogin} handleSignup={handleSignup} />
-  ) : isLoggedIn ? (
-    // 👤 Not on home page → user logged in → show profile dropdown
-    <div ref={dropdownRef} className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 bg-[#1C1813] hover:bg-[#241F1A] 
-          text-gray-100 border border-[#2A2520] px-3 py-2 rounded-xl transition-all"
-      >
-        <img
-          src={
-            user?.avatar ||
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgmNDDrkYKiQyONYsHR_3HM510JJNSrEkgEg&s"
-          }
-          alt="Profile"
-          className="w-8 h-8 rounded-full"
-        />
-        <span className="font-medium text-yellow-400">
-          {user?.name || "User"}
-        </span>
-
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className={`w-4 h-4 text-yellow-400 transition-transform duration-300 ${
-            open ? "rotate-180" : "rotate-0"
-          }`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </button>
-
-      {open && (
-        <div
-          className="absolute right-0 w-48 bg-[#1C1813] border border-[#2A2520]
-          text-gray-200 shadow-lg rounded-xl mt-2 z-50"
-        >
-          <Link
-            to="/profile"
-            className="block px-4 py-2 hover:bg-[#241F1A] text-yellow-400 rounded-t-xl transition"
-          >
-            Profile
-          </Link>
-          <Link
-            to="/settings"
-            className="block px-4 py-2 hover:bg-[#241F1A] text-yellow-400 transition"
-          >
-            Settings
-          </Link>
+      {/* RIGHT SECTION */}
+      <div className="flex items-center gap-4">
+        
+        {/* MOBILE MENU BUTTON */}
+        {user && location.pathname !== "/" && (
           <button
-            onClick={handleLogout}
-            className="block w-full text-left px-4 py-2 text-red-500 hover:bg-[#241F1A] rounded-b-xl transition"
+            onClick={() => setMobileMenu(!mobileMenu)}
+            className="md:hidden text-yellow-400"
           >
-            Logout
+            {mobileMenu ? <X size={26} /> : <Menu size={26} />}
           </button>
+        )}
+
+        {/* AUTH / PROFILE */}
+        {isHomed ? (
+          <AuthButton handleLogin={handleLogin} handleSignup={handleSignup} />
+        ) : isLoggedIn ? (
+          <div ref={dropdownRef} className="relative hidden md:block">
+            <button
+              onClick={() => setOpen(!open)}
+              className="flex items-center gap-2 bg-[#1C1813] border border-[#2A2520] px-3 py-2 rounded-xl"
+            >
+              <img
+                src={user?.avatar}
+                alt="Profile"
+                className="w-8 h-8 rounded-full"
+              />
+              <span className="text-yellow-400 font-medium">
+                {user?.name || "User"}
+              </span>
+              <ChevronDown  ref={arrowDirectionRef}/>
+              <span>
+
+              </span>
+            </button>
+
+            {open && (
+              <div className="absolute right-0 mt-2 w-48 bg-[#1C1813] border border-[#2A2520] rounded-xl shadow-lg">
+                <Link to="/profile" className="block px-4 py-2 hover:bg-[#241F1A]">
+                  Profile
+                </Link>
+                <Link to="/settings" className="block px-4 py-2 hover:bg-[#241F1A]">
+                  Settings
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-red-500 hover:bg-[#241F1A]"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <AuthButton handleLogin={handleLogin} handleSignup={handleSignup} />
+        )}
+      </div>
+
+      {/* MOBILE NAV MENU */}
+      {mobileMenu && (
+        <div className="absolute top-20 left-0 w-full bg-[#130F0B] border-t border-[#2A2520] md:hidden">
+          <nav className="flex flex-col p-4 gap-3">
+            {Navigations.map((n) => (
+              <Link
+                key={n.route}
+                to={n.route}
+                onClick={() => setMobileMenu(false)}
+                className="text-gray-300 hover:text-yellow-400"
+              >
+                {n.name}
+              </Link>
+            ))}
+
+            <Link
+              to="/profile"
+              onClick={() => setMobileMenu(false)}
+              className="text-yellow-400"
+            >
+              Profile
+            </Link>
+            <Link
+              to="/settings"
+              onClick={() => setMobileMenu(false)}
+              className="text-yellow-400"
+            >
+              Settings
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="text-left text-red-500"
+            >
+              Logout
+            </button>
+          </nav>
         </div>
       )}
-    </div>
-  ) : (
-    // ❌ Not on home page → user not logged in → show login & signup
-    <AuthButton handleLogin={handleLogin} handleSignup={handleSignup} />
-  )}
-</div>
-
     </header>
   );
 }

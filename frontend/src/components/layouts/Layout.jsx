@@ -1,22 +1,32 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Header from "../header/Header";
 import Footer from "../Footer";
 
 function Layout() {
-    return (
-        <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">
-                <Outlet />
-            </main>
-            {/* <footer className="bg-[#130F0B] text-center py-4 text-sm text-gray-600">
-                © {new Date().getFullYear()} Writeora. All rights reserved.
-            </footer> */}
+  const location = useLocation();
 
-            <Footer/>
-        </div>
-    );
+  // Add any paths where you want to hide the footer
+  const hideFooterPaths = ["/profile"];
+  // const hideHeaderPaths = ["/settings"]
+  const hideFooter = hideFooterPaths.some(
+    (p) => location.pathname === p || location.pathname.startsWith(`${p}/`)
+  );
+
+
+  // const hideHeader = hideHeaderPaths.some(
+  //   (p) => location.pathname === p || location.pathname.startsWith(`${p}/`)
+  // );
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header/> 
+      <main className="flex-1">
+        <Outlet />
+      </main>
+
+      {!hideFooter && <Footer />}
+    </div>
+  );
 }
 
 export default Layout;

@@ -19,6 +19,10 @@ import CreateContent from "../pages/CreateContent";
 import Posts from "../pages/Posts";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
+import Profile from "../pages/user/Profile";
+import Settings from "../pages/user/Settings";
+import ScrollToTopButton from "./components/ScrollToTopButton";
+import ContentEditor from "./components/contentEditor/ContentEditor";
 
 
 function AppContent() {
@@ -27,6 +31,7 @@ function AppContent() {
   return (
     <>
       <ScrollToTop />
+      <ScrollToTopButton/>
 
       <AnimatePresence mode="wait">
         {/* Full screen fade transition */}
@@ -108,11 +113,44 @@ function AppContent() {
             />
 
             <Route
+              path="profile"
+              element={
+                <ProtectedRoute>
+                  <PageWrapper>
+                    <Profile />
+                  </PageWrapper>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="settings"
+              element={
+                <ProtectedRoute>
+                  <PageWrapper>
+                    <Settings />
+                  </PageWrapper>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
               path="create"
               element={
                 <ProtectedRoute>
                   <PageWrapper>
                     <CreateContent />
+                  </PageWrapper>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="create/write"
+              element={
+                <ProtectedRoute>
+                  <PageWrapper>
+                    <ContentEditor />
                   </PageWrapper>
                 </ProtectedRoute>
               }
