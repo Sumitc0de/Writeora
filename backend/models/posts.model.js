@@ -114,10 +114,10 @@ const postSchema = mongoose.Schema({
         default: 0,
     },
 
-    bookmarksCount: {
-        type: Number,
-        default: 0,
-    },
+    // bookmarksCount: {
+    //     type: Number,
+    //     default: 0,
+    // },
 
 
     // Versioning (Pro Feature)

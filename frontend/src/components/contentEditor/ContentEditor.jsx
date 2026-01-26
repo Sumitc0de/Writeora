@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import TemplateSelector from "./TemplateSelector";
@@ -6,43 +6,50 @@ import Toolbar from "./Toolbar";
 import EditorArea from "./EditorArea";
 import HashtagSection from "./HashtagSection";
 import AITools from "./AITools";
-import LivePreview from "./LivePreview";
 
-import { FilePlus, Upload, AlertCircle, CheckCircle2, Loader } from "lucide-react";
+import {
+  FilePlus,
+  Upload,
+  AlertCircle,
+  CheckCircle2,
+  Loader,
+  Image as ImageIcon,
+  ArrowLeft,
+  Search,
+  Settings,
+  Sparkles
+} from "lucide-react";
+
 import { uploadImage } from "../../service/uploadImage";
 import { usePosts } from "../../context/PostContext";
 import { calculateReadTime } from "../../service/calculateReadTime";
+import Button from "../Button";
 
 const ContentEditor = () => {
-
   const { postData, setPostData, publishPost } = usePosts();
+
   const editorRef = useRef(null);
   const navigate = useNavigate();
-
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [isUploadingHeader, setIsUploadingHeader] = useState(false);
   const [publishError, setPublishError] = useState("");
   const [publishSuccess, setPublishSuccess] = useState("");
 
-  // ------------------------------------------------------------------
-  // ✅ Load draft from localStorage
-  // ------------------------------------------------------------------
+  // Load draft
   useEffect(() => {
     const draft = localStorage.getItem("draft");
-    if (draft) {
-      try {
-        setPostData((prev) => ({ ...prev, ...JSON.parse(draft) }));
-        console.log("💾 Draft loaded");
-      } catch (err) {
-        console.error("Draft load error:", err);
-      }
+    if (!draft) return;
+
+    try {
+      const parsedDraft = JSON.parse(draft);
+      setPostData((prev) => ({ ...prev, ...parsedDraft }));
+    } catch (err) {
+      console.error("Draft load error:", err);
     }
   }, [setPostData]);
 
-  // ------------------------------------------------------------------
-  // ✅ Auto-save draft every 30 seconds
-  // ------------------------------------------------------------------
+  // Auto-save
   useEffect(() => {
     const interval = setInterval(() => {
       if (postData.title || postData.content) {
@@ -53,233 +60,236 @@ const ContentEditor = () => {
     return () => clearInterval(interval);
   }, [postData]);
 
-  // ------------------------------------------------------------------
-  // ✅ Handle Input change
-  // ------------------------------------------------------------------
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setPostData((prev) => ({ ...prev, [name]: value }));
-  };
+  }, [setPostData]);
 
-  // ------------------------------------------------------------------
-  // ✅ Header Image Upload (Cloudinary)
-  // ------------------------------------------------------------------
-  const handleHeaderUpload = async (e) => {
+  const handleHeaderUpload = useCallback(async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsUploadingHeader(true);
+    setPublishError("");
 
     try {
       const data = await uploadImage(file);
-      setPostData(prev => ({
+      setPostData((prev) => ({
         ...prev,
         headerImage: {
           public_id: data.public_id,
-          url: data.url
-        }
+          url: data.url,
+        },
       }));
-
-
-
     } catch (err) {
       console.error("Header upload fail:", err);
       setPublishError("Failed to upload header image");
+    } finally {
+      setIsUploadingHeader(false);
     }
+  }, [setPostData]);
 
-    setIsUploadingHeader(false);
-  };
-
-
-
-  // ------------------------------------------------------------------
-  // ✅ Save Draft Manually
-  // ------------------------------------------------------------------
-  const handleSaveDraft = () => {
+  const handleSaveDraft = useCallback(() => {
     try {
       localStorage.setItem("draft", JSON.stringify(postData));
-      setPublishSuccess("💾 Draft saved!");
+      setPublishSuccess("Draft saved to cloud storage");
+      setPublishError("");
       setTimeout(() => setPublishSuccess(""), 2500);
-    } catch (err) {
-      setPublishError("Draft save failed");
+    } catch {
+      setPublishError("Failed to save draft");
     }
-  };
+  }, [postData]);
 
-  // ------------------------------------------------------------------
-  // ✅ Publish Post
-  // ------------------------------------------------------------------
-  const handlePublish = async () => {
-
+  const handlePublish = useCallback(async () => {
     setPublishError("");
     setPublishSuccess("");
 
-    if (!postData.title?.trim()) return setPublishError("Title required");
-    if (!postData.content?.trim()) return setPublishError("Content required");
+    if (!postData.title?.trim()) {
+      setPublishError("Please give your masterpiece a title");
+      return;
+    }
+
+    if (!postData.content?.trim()) {
+      setPublishError("The canvas is empty!");
+      return;
+    }
 
     setIsPublishing(true);
 
     try {
-      const readTime = calculateReadTime(postData.content)
-       const updatedPost = {
-    ...postData,
-    readingTime: readTime,
-  };
+      const readTime = calculateReadTime(postData.content);
+      const updatedPost = { ...postData, readingTime: readTime };
+
       await publishPost(updatedPost);
 
       localStorage.removeItem("draft");
-      setPublishSuccess("🚀 Post published!");
+      setPublishSuccess("Published successfully!");
 
       setTimeout(() => navigate("/discover"), 2000);
-
     } catch (err) {
-      console.error("Publish error:", err);
-      setPublishError(err.response?.data?.message || "Publish failed");
+      setPublishError(err?.response?.data?.message || "Publishing failed");
+    } finally {
+      setIsPublishing(false);
     }
-
-    setIsPublishing(false);
-  };
-
-  // console.log("FINAL POST DATA →", postData);
+  }, [postData, publishPost, navigate]);
 
   return (
-    <div className="min-h-screen pt-24 bg-[#0C0A07] text-gray-100 p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#050505] text-white pt-24 pb-32">
 
-        {/* Alerts */}
-        {publishSuccess && (
-          <div className="bg-green-500/10 border border-green-500 text-green-500 p-4 rounded-lg flex gap-2">
-            <CheckCircle2 size={18} /> {publishSuccess}
-          </div>
-        )}
+      {/* Top Bar - Navigation Only */}
+      <div className="fixed top-0 left-0 w-full h-[72px] bg-[#050505]/80 backdrop-blur-xl border-b border-white/[0.05] z-[100] flex items-center justify-between px-6 lg:px-20">
+        <div className="flex items-center gap-4">
+          <button onClick={() => navigate('/create')} className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+            <ArrowLeft size={18} />
+          </button>
+          <div className="h-6 w-px bg-white/10 mx-2"></div>
+          <span className="text-sm font-medium text-gray-500">Draft / Untitled</span>
+        </div>
+      </div>
 
-        {publishError && (
-          <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-lg flex gap-2">
-            <AlertCircle size={18} /> {publishError}
-          </div>
-        )}
+      {/* Bottom Action Bar */}
+      <div className="fixed bottom-0 left-0 w-full bg-[#050505]/90 backdrop-blur-xl border-t border-white/[0.05] z-[100] p-4 flex items-center justify-between px-6 lg:px-20">
+        <div className="text-xs text-gray-500 font-mono hidden sm:block">
+          {postData.content?.length || 0} characters
+        </div>
 
-        <div>
-        {/* Template Selector */}
-        <TemplateSelector
-          template={postData.template}
-          setTemplate={(t) => setPostData((p) => ({ ...p, template: t }))}
-          setTitle={(t) => setPostData((p) => ({ ...p, title: t }))}
-          setSubtitle={(s) => setPostData((p) => ({ ...p, subtitle: s }))}
-          setCategory={(c) => setPostData((p) => ({ ...p, category: c }))}
-          setContent={(c) => setPostData((p) => ({ ...p, content: c }))}
-        />
-
-        {/* Buttons */}
-        <div className="flex justify-end gap-4">
+        <div className="flex items-center gap-3 ml-auto">
           <button
             onClick={handleSaveDraft}
-            className="bg-yellow-600 px-5 py-2 rounded-lg flex items-center gap-2"
+            className="text-gray-400 hover:text-white text-sm font-medium px-4 py-2 hover:bg-white/5 rounded-lg transition-colors"
           >
-            <FilePlus size={18} /> Save Draft
+            Save Draft
           </button>
-
           <button
             onClick={handlePublish}
             disabled={isPublishing || isUploadingHeader}
-            className={`bg-blue-600 px-5 py-2 rounded-lg flex items-center gap-2 ${(isPublishing || isUploadingHeader) && "opacity-50"
+            className={`bg-[#F5C542] text-black px-6 py-2 rounded-lg font-bold text-sm hover:shadow-[0_0_20px_rgba(245,197,66,0.3)] transition-all flex items-center gap-2 ${(isPublishing || isUploadingHeader) ? "opacity-50 cursor-not-allowed" : ""
               }`}
           >
-            <Upload size={18} />
+            {isPublishing ? <Loader size={16} className="animate-spin" /> : <Upload size={16} />}
             {isPublishing ? "Publishing..." : "Publish"}
           </button>
         </div>
-    </div>
-        
+      </div>
 
-        {/* Header Image */}
-        <div className="relative group">
+      <div className="max-w-4xl mx-auto px-6 lg:px-10 mt-10">
 
+        {/* Alerts */}
+        {(publishSuccess || publishError) && (
+          <div className={`mb-8 p-4 rounded-xl border flex items-center gap-3 ${publishSuccess
+            ? "bg-green-500/10 border-green-500/30 text-green-400"
+            : "bg-red-500/10 border-red-500/30 text-red-400"
+            }`}>
+            {publishSuccess ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+            <span className="text-sm font-medium">{publishSuccess || publishError}</span>
+          </div>
+        )}
+
+        {/* Cover Image Area */}
+        <div className="relative group mb-12">
           {postData.headerImage?.url ? (
-            <img
-              src={postData.headerImage.url}
-              alt="Header"
-              className="w-full h-[25vw] object-cover rounded-2xl shadow-lg"
-            />
-          ) : (
-            <div className="h-[25vw] w-full flex items-center justify-center bg-[#241F1A] rounded-2xl border-2 border-dashed border-[#2A2520]">
-              🖼 Header Image Preview
+            <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-2xl group border border-white/[0.05]">
+              <img src={postData.headerImage.url} alt="Cover" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <label htmlFor="headerImageInput" className="cursor-pointer px-6 py-3 bg-white/10 backdrop-blur-md rounded-xl text-white font-medium hover:bg-white/20 transition-all border border-white/10 flex items-center gap-2">
+                  <ImageIcon size={18} /> Change Cover
+                </label>
+              </div>
             </div>
+          ) : (
+            <label htmlFor="headerImageInput" className="cursor-pointer group flex flex-col items-center justify-center w-full h-48 rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-[#F5C542]/50 transition-all">
+              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <ImageIcon size={20} className="text-gray-400 group-hover:text-[#F5C542]" />
+              </div>
+              <span className="text-gray-500 font-medium group-hover:text-gray-300">Add Cover Image</span>
+            </label>
           )}
-
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleHeaderUpload}
-            id="headerImageInput"
-            className="hidden"
-          />
-
-          <label
-            htmlFor="headerImageInput"
-            className={`absolute bottom-3 left-3 px-4 py-2 rounded-md bg-yellow-600 font-semibold cursor-pointer ${isUploadingHeader && "opacity-50 cursor-not-allowed"
-              }`}
-          >
-            {isUploadingHeader ? (
-              <>
-                <Loader size={16} className="animate-spin" /> Uploading...
-              </>
-            ) : (
-              "📷 Upload"
-            )}
-          </label>
+          <input type="file" accept="image/*" onChange={handleHeaderUpload} id="headerImageInput" className="hidden" />
         </div>
 
+        {/* Title area */}
+        <div className="space-y-4 mb-10">
+          <input
+            type="text"
+            name="title"
+            value={postData.title || ""}
+            onChange={handleChange}
+            placeholder="Article Title..."
+            className="w-full bg-transparent text-4xl md:text-5xl font-bold placeholder-gray-700 text-white outline-none border-none p-0 focus:ring-0"
+          />
+          <input
+            type="text"
+            name="subtitle"
+            value={postData.subtitle || ""}
+            onChange={handleChange}
+            placeholder="Add a subtitle..."
+            className="w-full bg-transparent text-xl md:text-2xl text-gray-400 placeholder-gray-800 outline-none border-none p-0 focus:ring-0 font-medium"
+          />
+        </div>
 
-        {/* Title / Subtitle / Category */}
-        <input
-          type="text"
-          name="title"
-          value={postData.title || ""}
-          onChange={handleChange}
-          placeholder="Your title..."
-          className="w-full bg-transparent text-4xl font-bold mb-2 border-b border-gray-700 focus:border-yellow-500"
-        />
+        {/* Meta Bar */}
+        <div className="flex items-center gap-4 mb-10 pb-6 border-b border-white/[0.05]">
+          <div className="flex-1">
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-[#F5C542] transition-colors" size={16} />
+              <input
+                type="text"
+                name="category"
+                value={postData.category || ""}
+                onChange={handleChange}
+                placeholder="Category..."
+                className="bg-white/[0.03] text-sm text-gray-300 pl-9 pr-4 py-2 rounded-lg border border-white/10 hover:border-white/20 focus:border-[#F5C542]/50 focus:outline-none focus:bg-white/[0.05] w-full max-w-[200px] transition-all"
+              />
+            </div>
+          </div>
+          <TemplateSelector
+            template={postData.template}
+            setTemplate={(t) => setPostData((p) => ({ ...p, template: t }))}
+            setTitle={(t) => setPostData((p) => ({ ...p, title: t }))}
+            setSubtitle={(s) => setPostData((p) => ({ ...p, subtitle: s }))}
+            setCategory={(c) => setPostData((p) => ({ ...p, category: c }))}
+            setContent={(c) => setPostData((p) => ({ ...p, content: c }))}
+            className="text-gray-400 hover:text-white"
+          />
+        </div>
 
-        <input
-          type="text"
-          name="subtitle"
-          value={postData.subtitle || ""}
-          onChange={handleChange}
-          placeholder="Subtitle..."
-          className="w-full bg-transparent text-lg mb-2 border-b border-gray-700 focus:border-yellow-500"
-        />
+        {/* Main Editor */}
+        <div className="relative min-h-[500px]">
+          {/* Sticky Toolbar moved inside EditorArea handling usually, but we place it here for layout */}
+          <div className="sticky top-24 z-30 mb-6 mx-auto max-w-2xl">
+            <Toolbar editorRef={editorRef} />
+          </div>
 
-        <input
-          type="text"
-          name="category"
-          value={postData.category || ""}
-          onChange={handleChange}
-          placeholder="Category (AI / Dev / Productivity)"
-          className="bg-[#241F1A] px-3 py-2 rounded-md w-60 focus:ring-2 focus:ring-yellow-500"
-        />
+          <EditorArea
+            editorRef={editorRef}
+            content={postData.content}
+            setContent={(c) => setPostData((p) => ({ ...p, content: c }))}
+          />
+        </div>
 
-         <AITools
-          content={postData.content}
-          setContent={(c) => setPostData((p) => ({ ...p, content: c }))}
-        />
+        {/* Footer Tools */}
+        <div className="mt-20 space-y-10 border-t border-white/[0.05] pt-10">
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <Sparkles size={16} className="text-[#F5C542]" /> AI Assistant
+            </h3>
+            <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-6">
+              <AITools
+                content={postData.content}
+                setContent={(c) => setPostData((p) => ({ ...p, content: c }))}
+              />
+            </div>
+          </div>
 
-        {/* Editor */}
-        <Toolbar editorRef={editorRef} />
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Tags</h3>
+            <HashtagSection
+              hashtags={postData.hashtags || []}
+              setHashtags={(tags) => setPostData((p) => ({ ...p, hashtags: tags }))}
+            />
+          </div>
+        </div>
 
-        <EditorArea
-          editorRef={editorRef}
-          content={postData.content}
-          setContent={(c) => setPostData((p) => ({ ...p, content: c }))}
-        />
-       
-        <HashtagSection
-          hashtags={postData.hashtags || []}
-          setHashtags={(tags) => setPostData((p) => ({ ...p, hashtags: tags }))}
-        />
-
-        {/* <LivePreview {...postData} /> */}
-
-        
       </div>
     </div>
   );

@@ -35,10 +35,10 @@ const createPost = async (req, res) => {
     } = req.body;
 
     // ❗ Basic field validation
-    if (!title || !content || !slug) {
+    if (!title || !content || !category) {
       return res.status(400).json({
         success: false,
-        message: "Title, content and slug are required",
+        message: "Title, content and Category are required",
       });
     }
 
@@ -74,7 +74,7 @@ const createPost = async (req, res) => {
     console.error("❌ Create Post Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to create post",
+      message: "Inputs are required",
     });
   }
 };

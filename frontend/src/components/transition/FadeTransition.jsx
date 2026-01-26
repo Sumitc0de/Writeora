@@ -1,22 +1,32 @@
-// src/components/FadeTransition.jsx
 import { motion } from "framer-motion";
 
 export default function FadeTransition() {
- return (
+  return (
     <motion.div
       initial={{ opacity: 1 }}
-      animate={{ opacity: 0 }}
-      exit={{ opacity: 1 }}
-      transition={{ duration: 0.6, ease: "easeInOut" }}
-      className="fixed inset-0 flex items-center justify-center bg-[#0F0D0A] z-[99999] pointer-events-none"
+      animate={{ opacity: 0, transition: { delay: 0.2, duration: 0.8 } }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 pointer-events-none z-[99999] flex flex-col"
     >
-      <motion.div
-        initial={{ scale: 0, opacity: 0.8 }}
-        animate={{ scale: 6, opacity: 0 }}
-        exit={{ scale: 0, opacity: 0.8 }}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
-        className="w-40 h-40 rounded-full bg-yellow-500 blur-3xl"
-      />
+      {/* 5 Column Wipe */}
+      <div className="flex w-full h-full">
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ height: "100%" }}
+            animate={{ height: "0%" }}
+            exit={{ height: "0%" }} // Don't animate out, just clear
+            transition={{
+              duration: 0.6,
+              ease: [0.22, 1, 0.36, 1],
+              delay: i * 0.05
+            }}
+            className="flex-1 bg-[#F5C542] border-r border-black/10 last:border-none relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-black/10" />
+          </motion.div>
+        ))}
+      </div>
     </motion.div>
   );
 }

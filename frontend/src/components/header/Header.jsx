@@ -2,28 +2,18 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthButton from "../AuthButton";
 import { useAuth } from "../../context/AuthContext";
-import { Menu, X, ChevronDown } from "lucide-react"; // ✅ added 
-
+import { Menu, X, ChevronDown, Sparkles } from "lucide-react";
 
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  const [open, setOpen] = useState(false);          // profile dropdown
-  const [mobileMenu, setMobileMenu] = useState(false); // ✅ mobile nav
-  const dropdownRef = useRef(null);   // Dropdown refference
-  const arrowDirectionRef = useRef();  // arrow refference 
+  const [open, setOpen] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
+  const dropdownRef = useRef(null);
 
-  // DropDown user profile
-  useEffect(() => {
-    if (arrowDirectionRef.current) {
-      arrowDirectionRef.current.style.transform = open ? "rotate(180deg)" : "rotate(0deg)";
-      arrowDirectionRef.current.style.transition = "transform 0.3s ease";
-    }
-  }, [open]);
-
-  /* ---------------- CLOSE DROPDOWNS ON OUTSIDE CLICK ---------------- */
+  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -34,8 +24,6 @@ function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
-  // Handle logout
   const handleLogout = async () => {
     try {
       await logout();
@@ -46,19 +34,9 @@ function Header() {
     }
   };
 
+  const handleLogin = () => navigate("/login");
+  const handleSignup = () => navigate("/signup");
 
-  // Handle Login, redirect to /login route
-  const handleLogin = () => {
-    navigate("/login");
-  };
-
-
-  // Handle SignUp, redirect to /signup route
-  const handleSignup = () => {
-    navigate("/signup");
-  };
-
-  // Home route and checking for loggedIn User 
   const isHomed = location.pathname === "/";
   const isLoggedIn = !!user;
 
@@ -67,33 +45,33 @@ function Header() {
     { name: "Write", route: "/create" },
     { name: "Learn", route: "/learn" },
     { name: "About", route: "/about" },
-    { name: "Contact Us", route: "/contact-us" },
+    { name: "Contact", route: "/contact-us" },
   ];
 
   return (
-    <header className="fixed top-0 z-50 w-full h-20 backdrop-blur-md bg-[#130F0B] border-b border-[#c9c1c15c] flex items-center justify-between px-6 lg:px-28">
-      
+    <header className="fixed top-0 z-50 w-full h-[72px] bg-[#050505]/80 backdrop-blur-xl border-b border-white/[0.08] flex items-center justify-between px-6 lg:px-20 transition-all duration-300">
+
       {/* LOGO */}
-      <div className="text-2xl md:text-3xl font-bold text-white">
-        <Link to="/">
-          Write<span className="text-yellow-500">ora.</span>
-        </Link>
+      <div className="flex items-center gap-2 text-xl md:text-2xl font-bold tracking-tight text-white group cursor-pointer" onClick={() => navigate('/')}>
+        <div className="w-8 h-8 rounded-lg bg-[#F5C542] flex items-center justify-center text-black shadow-[0_0_15px_rgba(245,197,66,0.5)] group-hover:scale-105 transition-transform">
+          <Sparkles size={18} fill="black" />
+        </div>
+        <span>Writeora<span className="text-[#F5C542]">.ai</span></span>
       </div>
 
       {/* DESKTOP NAV */}
       {user && location.pathname !== "/" && (
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-1 p-1 bg-white/[0.03] rounded-full border border-white/[0.05]">
           {Navigations.map((n) => {
             const isActive = location.pathname === n.route;
             return (
               <Link
                 key={n.route}
                 to={n.route}
-                className={`text-lg transition ${
-                  isActive
-                    ? "text-yellow-500 font-semibold"
-                    : "text-gray-300 hover:text-yellow-400"
-                }`}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${isActive
+                    ? "bg-[#F5C542] text-black shadow-lg"
+                    : "text-gray-400 hover:text-white hover:bg-white/[0.05]"
+                  }`}
               >
                 {n.name}
               </Link>
@@ -104,54 +82,59 @@ function Header() {
 
       {/* RIGHT SECTION */}
       <div className="flex items-center gap-4">
-        
+
         {/* MOBILE MENU BUTTON */}
         {user && location.pathname !== "/" && (
           <button
             onClick={() => setMobileMenu(!mobileMenu)}
-            className="md:hidden text-yellow-400"
+            className="md:hidden p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition"
           >
-            {mobileMenu ? <X size={26} /> : <Menu size={26} />}
+            {mobileMenu ? <X size={24} /> : <Menu size={24} />}
           </button>
         )}
 
         {/* AUTH / PROFILE */}
         {isHomed ? (
-          <AuthButton handleLogin={handleLogin} handleSignup={handleSignup} />
+          <div className="flex items-center gap-3">
+            <button onClick={handleLogin} className="text-sm font-medium text-gray-300 hover:text-white transition">Log in</button>
+            <button onClick={handleSignup} className="px-4 py-2 bg-white text-black text-sm font-semibold rounded-lg hover:bg-gray-200 transition shadow-[0_0_15px_rgba(255,255,255,0.2)]">Sign up</button>
+          </div>
         ) : isLoggedIn ? (
           <div ref={dropdownRef} className="relative hidden md:block">
             <button
               onClick={() => setOpen(!open)}
-              className="flex items-center gap-2 bg-[#1C1813] border border-[#2A2520] px-3 py-2 rounded-xl"
+              className="flex items-center gap-3 bg-white/[0.03] border border-white/[0.08] pl-2 pr-4 py-1.5 rounded-full hover:bg-white/[0.08] transition-all"
             >
               <img
-                src={user?.avatar}
+                src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name}&background=F5C542&color=000`}
                 alt="Profile"
-                className="w-8 h-8 rounded-full"
+                className="w-8 h-8 rounded-full border border-white/10"
               />
-              <span className="text-yellow-400 font-medium">
+              <span className="text-sm font-medium text-gray-200 max-w-[100px] truncate">
                 {user?.name || "User"}
               </span>
-              <ChevronDown  ref={arrowDirectionRef}/>
-              <span>
-
-              </span>
+              <ChevronDown size={14} className={`text-gray-400 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
             </button>
 
             {open && (
-              <div className="absolute right-0 mt-2 w-48 bg-[#1C1813] border border-[#2A2520] rounded-xl shadow-lg">
-                <Link to="/profile" className="block px-4 py-2 hover:bg-[#241F1A]">
-                  Profile
-                </Link>
-                <Link to="/settings" className="block px-4 py-2 hover:bg-[#241F1A]">
-                  Settings
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left px-4 py-2 text-red-500 hover:bg-[#241F1A]"
-                >
-                  Logout
-                </button>
+              <div className="absolute right-0 mt-3 w-56 bg-[#1A1A1A] border border-white/[0.08] rounded-xl shadow-2xl backdrop-blur-md overflow-hidden animate-dropdown">
+                <div className="p-2 border-b border-white/[0.05]">
+                  <div className="text-xs text-gray-500 px-3 py-2 uppercase tracking-wider">Account</div>
+                  <Link to="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/[0.05] rounded-lg transition">
+                    Profile
+                  </Link>
+                  <Link to="/settings" className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/[0.05] rounded-lg transition">
+                    Settings
+                  </Link>
+                </div>
+                <div className="p-2">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition"
+                  >
+                    Sign Out
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -162,39 +145,21 @@ function Header() {
 
       {/* MOBILE NAV MENU */}
       {mobileMenu && (
-        <div className="absolute top-20 left-0 w-full bg-[#130F0B] border-t border-[#2A2520] md:hidden">
-          <nav className="flex flex-col p-4 gap-3">
+        <div className="absolute top-[72px] left-0 w-full bg-[#050505]/95 backdrop-blur-xl border-b border-white/[0.1] md:hidden shadow-2xl">
+          <nav className="flex flex-col p-6 gap-2">
             {Navigations.map((n) => (
               <Link
                 key={n.route}
                 to={n.route}
                 onClick={() => setMobileMenu(false)}
-                className="text-gray-300 hover:text-yellow-400"
+                className="p-4 text-lg font-medium text-gray-300 hover:text-white hover:bg-white/[0.05] rounded-xl transition"
               >
                 {n.name}
               </Link>
             ))}
-
-            <Link
-              to="/profile"
-              onClick={() => setMobileMenu(false)}
-              className="text-yellow-400"
-            >
-              Profile
-            </Link>
-            <Link
-              to="/settings"
-              onClick={() => setMobileMenu(false)}
-              className="text-yellow-400"
-            >
-              Settings
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="text-left text-red-500"
-            >
-              Logout
-            </button>
+            <div className="h-px bg-white/[0.1] my-2"></div>
+            <Link to="/profile" onClick={() => setMobileMenu(false)} className="p-4 text-lg text-gray-300 hover:text-white">Profile</Link>
+            <button onClick={handleLogout} className="p-4 text-left text-lg text-red-500 hover:bg-red-500/10 rounded-xl">Logout</button>
           </nav>
         </div>
       )}

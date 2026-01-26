@@ -1,61 +1,81 @@
 import { useNavigate } from "react-router-dom";
-import { PenLine, FileText, BookOpen } from "lucide-react";
+import { PenLine, FileText, BookOpen, Sparkles, ArrowRight } from "lucide-react";
+import Background from "../src/components/Background";
+import { motion } from "framer-motion";
 
 export default function CreateContent() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen mt-20 bg-[#0C0A07] text-white px-4 sm:px-6 lg:px-28 py-20">
-      
+    <div className="min-h-screen bg-[#050505] text-white pt-24 pb-20 px-4 sm:px-6 lg:px-20 relative overflow-hidden">
+      <Background />
+
       {/* HERO */}
-      <div className="max-w-3xl">
-        <h1 className="text-4xl md:text-5xl font-bold text-yellow-500">
-          Start Writing on Writeora ✍️
-        </h1>
-
-        <p className="mt-4 text-lg text-gray-400 leading-relaxed">
-          Turn your ideas into meaningful content.  
-          Write blogs, articles, or learning notes — beautifully structured and distraction-free.
-        </p>
-
-        <button
-          onClick={() => navigate("/create/write")}
-          className="mt-8 px-8 py-4 rounded-full bg-yellow-500 text-black font-semibold hover:bg-yellow-600 transition"
+      <div className="max-w-4xl relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          Start Writing →
-        </button>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-6 backdrop-blur-md">
+            <Sparkles size={14} className="text-[#F5C542]" />
+            <span className="text-xs font-semibold text-gray-300 uppercase tracking-widest">Creator Studio</span>
+          </div>
+
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            What will you <br /><span className="text-[#F5C542]">create today?</span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed mb-10">
+            Unleash your creativity with our AI-powered suite. Whether it's a blog, a technical guide, or personal notes, we've got you covered.
+          </p>
+
+          <button
+            onClick={() => navigate("/create/write")}
+            className="group px-8 py-4 rounded-xl bg-[#F5C542] text-black font-bold text-lg hover:shadow-[0_0_30px_rgba(245,197,66,0.4)] transition-all flex items-center gap-2"
+          >
+            Start Writing <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </motion.div>
       </div>
 
       {/* OPTIONS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20">
-        <Card
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 relative z-10">
+        <OptionCard
           icon={<PenLine />}
-          title="Blog Writing"
-          desc="Share thoughts, stories, and experiences with the world."
+          title="Blog Post"
+          desc="Share your thoughts and stories with a global audience."
+          delay={0.1}
         />
-        <Card
+        <OptionCard
           icon={<FileText />}
-          title="Article Writing"
-          desc="Write in-depth articles with proper structure and clarity."
+          title="Technical Article"
+          desc="In-depth documentation with code blocks and diagrams."
+          delay={0.2}
         />
-        <Card
+        <OptionCard
           icon={<BookOpen />}
-          title="Learning Notes"
-          desc="Create tutorials, guides, and educational content."
+          title="Knowledge Base"
+          desc="Create structured learning guides and educational sets."
+          delay={0.3}
         />
       </div>
     </div>
   );
 }
 
-function Card({ icon, title, desc }) {
+function OptionCard({ icon, title, desc, delay }) {
   return (
-    <div className="bg-[#1C1813] rounded-2xl p-6 hover:scale-[1.02] transition">
-      <div className="w-10 h-10 rounded-full bg-yellow-500 text-black flex items-center justify-center mb-4">
-        {icon}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: delay }}
+      className="group p-8 rounded-3xl bg-[#1A1A1A]/50 border border-white/[0.08] hover:bg-white/[0.05] hover:border-[#F5C542]/30 backdrop-blur-sm transition-all duration-300 cursor-default"
+    >
+      <div className="w-14 h-14 rounded-2xl bg-[#F5C542]/10 border border-[#F5C542]/20 text-[#F5C542] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+        <div className="w-6 h-6">{icon}</div>
       </div>
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="mt-2 text-gray-400 text-sm">{desc}</p>
-    </div>
+      <h3 className="text-xl font-bold mb-3 text-white group-hover:text-[#F5C542] transition-colors">{title}</h3>
+      <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
+    </motion.div>
   );
 }

@@ -17,87 +17,106 @@ export const PostProvider = ({ children }) => {
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState(null);
 
-  // FIXED: headerImage SHOULD be an object
+  // ✅ Correct post data structure
   const [postData, setPostData] = useState({
     headerImage: {
       public_id: "",
-      url: ""
+      url: "",
     },
     title: "",
     subtitle: "",
     category: "",
     content: "",
     hashtags: [],
-    readingTime: 1
+    readingTime: 1,
   });
 
-  // Fetch posts
+  // ✅ Fetch posts
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
+
       const response = await getAllPosts();
-      setPosts(response.posts || []);
+      setPosts(response?.posts || []);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch posts");
+      setError(err?.response?.data?.message || "Failed to fetch posts");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // FIXED: Publish Post
- const publishPost = useCallback(
-  async (postPayload) => {
-    if (!user) throw new Error("User not authenticated");
+  // ✅ Publish post (fully safe)
+  const publishPost = useCallback(
+    async (postPayload) => {
+      if (!user) {
+        const authError = new Error("User not authenticated");
+        setError(authError.message);
+        throw authError;
+      }
 
-    const payload = {
-      title: postPayload.title?.trim(),
-      subtitle: postPayload.subtitle || "",
-      category: postPayload.category || "General",
-      content: postPayload.content,
-      headerImage: {
-        public_id: postPayload.headerImage?.public_id || "",
-        url: postPayload.headerImage?.url || ""
-      },
-      hashtags: postPayload.hashtags || [],
-      contentImages: postPayload.contentImages || [],
-      readingTime: postPayload.readingTime || 1
-    };
+      const payload = {
+        title: postPayload.title?.trim(),
+        subtitle: postPayload.subtitle || "",
+        category: postPayload.category || "General",
+        content: postPayload.content,
+        headerImage: {
+          public_id: postPayload.headerImage?.public_id || "",
+          url: postPayload.headerImage?.url || "",
+        },
+        hashtags: Array.isArray(postPayload.hashtags)
+          ? postPayload.hashtags
+          : [],
+        contentImages: postPayload.contentImages || [],
+        readingTime: postPayload.readingTime || 1,
+      };
 
-    if (!payload.title || !payload.content) {
-      throw new Error("Title and content are required");
-    }
+      if (!payload.title || !payload.content) {
+        const validationError = new Error("Title and content are required");
+        setError(validationError.message);
+        throw validationError;
+      }
 
-    try {
-      await createPost(payload);
+      try {
+        setPublishing(true);
+        setError(null);
 
-      // 🚀 100% FIX: re-fetch posts so author is populated
-      await fetchPosts();
+        await createPost(payload);
 
-      // Reset form
-      setPostData({
-        headerImage: { public_id: "", url: "" },
-        title: "",
-        subtitle: "",
-        category: "",
-        content: "",
-        hashtags: [],
-        readingTime:1
-      });
+        // 🔥 Re-fetch so populated author is returned
+        await fetchPosts();
 
-    } catch (err) {
-      console.error("Publish error:", err);
-      throw err;
-    }
-  },
-  [user, fetchPosts]
-);
+        // ✅ Reset form
+        setPostData({
+          headerImage: { public_id: "", url: "" },
+          title: "",
+          subtitle: "",
+          category: "",
+          content: "",
+          hashtags: [],
+          readingTime: 1,
+        });
+      } catch (err) {
+        setError(err?.response?.data?.message || "Failed to publish post");
+        throw err;
+      } finally {
+        setPublishing(false);
+      }
+    },
+    [user, fetchPosts]
+  );
 
+  // ✅ Fetch only when auth state is ready
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    if (user !== undefined) {
+      fetchPosts();
+    }
+  }, [user, fetchPosts]);
 
+  // ✅ Memoized context value
   const value = useMemo(
     () => ({
       posts,
@@ -106,18 +125,31 @@ export const PostProvider = ({ children }) => {
       fetchPosts,
       publishPost,
       loading,
+      publishing,
       error,
     }),
-    [posts, postData, fetchPosts, publishPost, loading, error]
+    [
+      posts,
+      postData,
+      fetchPosts,
+      publishPost,
+      loading,
+      publishing,
+      error,
+    ]
   );
 
   return (
-    <PostContext.Provider value={value}>{children}</PostContext.Provider>
+    <PostContext.Provider value={value}>
+      {children}
+    </PostContext.Provider>
   );
 };
 
 export const usePosts = () => {
   const context = useContext(PostContext);
-  if (!context) throw new Error("usePosts must be inside PostProvider");
+  if (!context) {
+    throw new Error("usePosts must be used within a PostProvider");
+  }
   return context;
 };

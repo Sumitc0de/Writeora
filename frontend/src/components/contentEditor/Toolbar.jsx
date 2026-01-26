@@ -1,120 +1,56 @@
-import React, { useRef } from "react";
-import { Bold, Italic, Underline, Link2, Image, Type } from "lucide-react";
+import React from "react";
+import {
+  Bold, Italic, Underline, List, ListOrdered, Quote, Code, Heading1, Heading2, Link as LinkIcon
+} from "lucide-react";
 
-const Toolbar = ({ editorRef, setContent }) => {
-  const fileInputRef = useRef(null);
-
-  // ---------- INSERT IMAGE (shared logic with EditorArea) ----------
-  const insertImage = (file) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const imgHTML = `
-        <img 
-          src="${reader.result}" 
-          style="max-width:100%; border-radius:12px; margin:12px 0;" 
-        />
-      `;
-
-      document.execCommand("insertHTML", false, imgHTML);
-
-      // update parent state
-      if (editorRef.current) {
-        setContent(editorRef.current.innerHTML);
-        editorRef.current.focus();
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // ---------- Toolbar Commands ----------
-  const handleCommand = (command, value = null) => {
+export default function Toolbar({ editorRef }) {
+  const applyFormat = (command, value = null) => {
     document.execCommand(command, false, value);
-    setContent(editorRef.current.innerHTML);
-    editorRef.current.focus();
-  };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) insertImage(file);
-  };
-
-  const handleLink = () => {
-    const url = prompt("Enter URL:");
-    if (url) {
-      document.execCommand("createLink", false, url);
-      setContent(editorRef.current.innerHTML);
+    if (editorRef.current) {
+      editorRef.current.focus();
     }
   };
 
-  const handleHeading = () => {
-    const level = prompt("Heading (1–6):", "2");
-    if (level >= 1 && level <= 6) {
-      document.execCommand("formatBlock", false, `h${level}`);
-      setContent(editorRef.current.innerHTML);
+  const addLink = () => {
+    const url = prompt("Enter the URL:");
+    if (url) {
+      applyFormat("createLink", url);
     }
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2 bg-[#241F1A] border border-[#2A2520] p-2 rounded-lg mb-3">
+    <div className="flex items-center justify-center">
+      <div className="flex items-center gap-1 px-2 py-1.5 bg-[#1A1A1A]/90 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl">
 
-      {/* Bold */}
-      <button
-        onClick={() => handleCommand("bold")}
-        className="p-2 hover:bg-yellow-600/30 rounded-md"
-      >
-        <Bold size={16} />
-      </button>
+        <ToolButton onClick={() => applyFormat("formatBlock", "H1")} icon={<Heading1 size={18} />} tooltip="Heading 1" />
+        <ToolButton onClick={() => applyFormat("formatBlock", "H2")} icon={<Heading2 size={18} />} tooltip="Heading 2" />
 
-      {/* Italic */}
-      <button
-        onClick={() => handleCommand("italic")}
-        className="p-2 hover:bg-yellow-600/30 rounded-md"
-      >
-        <Italic size={16} />
-      </button>
+        <div className="w-px h-5 bg-white/10 mx-1" />
 
-      {/* Underline */}
-      <button
-        onClick={() => handleCommand("underline")}
-        className="p-2 hover:bg-yellow-600/30 rounded-md"
-      >
-        <Underline size={16} />
-      </button>
+        <ToolButton onClick={() => applyFormat("bold")} icon={<Bold size={18} />} tooltip="Bold" />
+        <ToolButton onClick={() => applyFormat("italic")} icon={<Italic size={18} />} tooltip="Italic" />
+        <ToolButton onClick={() => applyFormat("underline")} icon={<Underline size={18} />} tooltip="Underline" />
+        <ToolButton onClick={addLink} icon={<LinkIcon size={18} />} tooltip="Link" />
 
-      {/* Heading */}
-      <button
-        onClick={handleHeading}
-        className="p-2 hover:bg-yellow-600/30 rounded-md"
-      >
-        <Type size={16} />
-      </button>
+        <div className="w-px h-5 bg-white/10 mx-1" />
 
-      {/* Link */}
-      <button
-        onClick={handleLink}
-        className="p-2 hover:bg-yellow-600/30 rounded-md"
-      >
-        <Link2 size={16} />
-      </button>
+        <ToolButton onClick={() => applyFormat("insertUnorderedList")} icon={<List size={18} />} tooltip="Bullet List" />
+        <ToolButton onClick={() => applyFormat("insertOrderedList")} icon={<ListOrdered size={18} />} tooltip="Numbered List" />
+        <ToolButton onClick={() => applyFormat("formatBlock", "blockquote")} icon={<Quote size={18} />} tooltip="Quote" />
+        <ToolButton onClick={() => applyFormat("formatBlock", "pre")} icon={<Code size={18} />} tooltip="Code Block" />
 
-      {/* Image Insert */}
-      <button
-        onClick={() => fileInputRef.current.click()}
-        className="p-2 hover:bg-yellow-600/30 rounded-md"
-      >
-        <Image size={16} />
-      </button>
-
-      {/* Hidden File Input */}
-      <input
-        type="file"
-        accept="image/*"
-        ref={fileInputRef}
-        className="hidden"
-        onChange={handleImageUpload}
-      />
+      </div>
     </div>
   );
-};
+}
 
-export default Toolbar;
+const ToolButton = ({ onClick, icon, tooltip }) => (
+  <button
+    onClick={onClick}
+    title={tooltip}
+    className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all active:scale-90"
+    type="button"
+  >
+    {icon}
+  </button>
+);

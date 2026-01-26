@@ -7,7 +7,7 @@ import {
   Star
 } from "lucide-react";
 
-export default function PostActionBar({scrollToComments}) {
+export default function PostActionBar({scrollToComments, handleLikeToggle, isLiked, totalLike}) {
     return (
         <div
             className="
@@ -26,12 +26,19 @@ export default function PostActionBar({scrollToComments}) {
             {/* Like */}
             <button
                 title="Like"
-                className="
-                    text-gray-300 transition hover:text-[#F8C12E]
+                onClick={handleLikeToggle}
+                className={`
+                    relative transition hover:text-[#F8C12E]
                     hover:drop-shadow-[0_0_6px_#F8C12E]
-                "
+                    ${isLiked ? 'text-[#F8C12E] fill-[#F8C12E]' : 'text-gray-300'}
+                `}
             >
                 <ThumbsUp size={22} strokeWidth={2} />
+                {totalLike > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-[#F8C12E] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                        {totalLike}
+                    </span>
+                )}
             </button>
 
             {/* Favorite */}
@@ -43,17 +50,6 @@ export default function PostActionBar({scrollToComments}) {
                 "
             >
                 <Star size={22} strokeWidth={2} />
-            </button>
-
-            {/* Save */}
-            <button
-                title="Save"
-                className="
-                    text-gray-300 transition hover:text-[#F8C12E]
-                    hover:drop-shadow-[0_0_6px_#F8C12E]
-                "
-            >
-                <Bookmark size={22} strokeWidth={2} />
             </button>
 
             {/* Share */}

@@ -6,12 +6,14 @@ function Button({ children, type = "button", onClick, className = "" }) {
       type={type}
       onClick={onClick}
       className={`
-        px-3 py-2 text-sm
-        text-black
-        sm:px-4 sm:py-2.5 sm:text-base
-        rounded-md bg-yellow-500 font-semibold
-        hover:bg-yellow-700 transition-all
-        whitespace-nowrap
+        relative overflow-hidden
+        px-5 py-2.5 text-sm sm:text-base font-medium
+        rounded-xl
+        text-black bg-[#F5C542]
+        shadow-[0_2px_10px_rgba(245,197,66,0.3)]
+        hover:shadow-[0_4px_20px_rgba(245,197,66,0.5)]
+        hover:scale-[1.02] active:scale-[0.98]
+        transition-all duration-300 ease-out
         ${className}
       `}
     >

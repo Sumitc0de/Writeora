@@ -4,21 +4,20 @@ import Button from "./Button";
 const AuthButton = ({ handleLogin, handleSignup }) => (
   <div className="flex items-center gap-4">
     
-    {/* 🔐 Login → hidden on mobile */}
-    <div className="hidden sm:block">
-      <Button
-        onClick={handleLogin}
-        className="relative px-5 py-2.5 rounded-lg font-medium text-yellow-400 
-                   border border-yellow-400/70 bg-yellow-500/10 backdrop-blur-sm
-                   hover:bg-yellow-500/20 hover:border-yellow-400
-                   hover:shadow-[0_0_12px_rgba(234,179,8,0.5)] 
-                   transition-all duration-300"
-      >
-        <span className="relative z-10 text-black">Login</span>
-      </Button>
-    </div>
+      <div className="hidden sm:block">
+        <Button
+          onClick={handleLogin}
+          className="relative px-5 py-2.5 rounded-lg font-medium text-black 
+                     border border-yellow-400 bg-yellow-500 
+                     hover:bg-yellow-600/30 hover:border-yellow-300
+                     hover:shadow-[0_0_12px_rgba(234,179,8,0.6)] 
+                     transition-all duration-300"
+        >
+          <span className="relative z-10">Login</span>
+        </Button>
+      </div>
 
-    {/* 🚀 Get Started → always visible */}
+      {/* 🚀 Get Started → always visible */}
     <Button
       onClick={handleSignup}
       className="relative px-6 py-2.5 rounded-lg font-semibold text-black 

@@ -165,4 +165,172 @@ const changePassword = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, logoutUser, updateUser, changePassword };
+// Update Username (with existence check)
+const updateUsername = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { username } = req.body;
+
+    if (!username || username.trim().length < 3) {
+      return res.status(400).json({ message: "Username must be at least 3 characters" });
+    }
+
+    // Check if username already exists (case-insensitive)
+    const existingUser = await User.findOne({
+      name: { $regex: new RegExp(`^${username}$`, 'i') },
+      _id: { $ne: userId } // Exclude current user
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already taken" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name: username.trim() },
+      { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Username updated successfully",
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error("updateUsername error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// Update Bio
+const updateBio = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { bio } = req.body;
+
+    if (bio && bio.length > 500) {
+      return res.status(400).json({ message: "Bio cannot exceed 500 characters" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { bio: bio || "" },
+      { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Bio updated successfully",
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error("updateBio error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// Update Avatar
+const updateAvatar = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { avatar } = req.body;
+
+    if (!avatar || !avatar.url) {
+      return res.status(400).json({ message: "Avatar URL is required" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { avatar: { public_id: avatar.public_id || "", url: avatar.url } },
+      { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Avatar updated successfully",
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error("updateAvatar error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// Delete User Profile
+const deleteProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ message: "Password is required to delete account" });
+    }
+
+    // Verify password before deletion
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+
+    // Delete user
+    await User.findByIdAndDelete(userId);
+
+    // Clear authentication cookie
+    const isProd = process.env.NODE_ENV === "production";
+    res.cookie("token", "", {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      expires: new Date(0),
+    });
+
+    res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.error("deleteProfile error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// Get Current User Settings
+const getUserSettings = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId).select('-password -resetPasswordToken -resetPasswordExpire');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("getUserSettings error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  logoutUser,
+  updateUser,
+  changePassword,
+  updateUsername,
+  updateBio,
+  updateAvatar,
+  deleteProfile,
+  getUserSettings
+};

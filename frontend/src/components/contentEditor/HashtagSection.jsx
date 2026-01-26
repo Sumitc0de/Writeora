@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Hash, X } from "lucide-react";
+import { Hash, X, Plus } from "lucide-react";
 
 const HashtagSection = ({ hashtags = [], setHashtags }) => {
   const [input, setInput] = useState("");
 
   const addHashtag = () => {
-    const trimmed = input.trim();
+    const trimmed = input.trim().replace(/^#/, '');
     if (!trimmed || hashtags.includes(trimmed)) return;
     setHashtags([...hashtags, trimmed]);
     setInput("");
@@ -16,47 +16,57 @@ const HashtagSection = ({ hashtags = [], setHashtags }) => {
   };
 
   return (
-    <div className="max-w-full mx-auto mt-8 bg-[#1C1813] border border-[#2A2520] p-5 rounded-xl">
-      <h3 className="flex items-center gap-2 text-yellow-500 text-lg font-semibold mb-3">
-        <Hash className="w-5 h-5" /> Add Hashtags
-      </h3>
+    <div className="bg-white/[0.02] border border-white/[0.05] p-6 rounded-2xl">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-8 h-8 rounded-lg bg-[#F5C542]/10 flex items-center justify-center text-[#F5C542]">
+          <Hash size={18} />
+        </div>
+        <h3 className="text-white text-base font-semibold">
+          Topics & Tags
+        </h3>
+      </div>
 
       {/* Input */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="relative group mb-6">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addHashtag()}
-          placeholder="Type a hashtag and press Enter..."
-          className="flex-1 bg-[#241F1A] border border-[#2A2520] rounded-md px-3 py-2 text-gray-300 outline-none focus:border-yellow-500"
+          placeholder="Add a tag..."
+          className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 pl-10 text-sm text-white placeholder-gray-500 outline-none focus:border-[#F5C542]/50 focus:bg-white/[0.02] transition-all"
         />
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+          <Hash size={14} />
+        </div>
         <button
           onClick={addHashtag}
-          className="px-4 py-2 w-full sm:w-fit bg-yellow-600 hover:bg-yellow-500 text-black rounded-md transition-all font-medium"
+          disabled={!input.trim()}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-[#F5C542] text-black rounded-lg hover:shadow-[0_0_10px_rgba(245,197,66,0.3)] disabled:opacity-0 disabled:pointer-events-none transition-all"
         >
-          Add
+          <Plus size={14} />
         </button>
       </div>
 
       {/* Hashtag List */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2">
         {hashtags.length > 0 ? (
           hashtags.map((tag, index) => (
             <div
               key={index}
-              className="flex items-center gap-1 bg-[#2A2520] text-yellow-400 px-3 py-1.5 rounded-full text-sm"
+              className="group flex items-center gap-1.5 pl-3 pr-2 py-1.5 bg-white/[0.05] border border-white/[0.05] hover:border-[#F5C542]/30 text-gray-300 rounded-lg text-sm transition-all"
             >
-              #{tag}
-              <X
-                size={14}
-                className="cursor-pointer hover:text-red-400"
+              <span className="text-[#F5C542]">#</span>{tag}
+              <button
                 onClick={() => removeHashtag(tag)}
-              />
+                className="p-0.5 rounded-md hover:bg-white/10 text-gray-500 hover:text-red-400 ml-1 transition-colors"
+              >
+                <X size={12} />
+              </button>
             </div>
           ))
         ) : (
-          <p className="text-gray-500 text-sm italic">
-            No hashtags added yet.
+          <p className="text-gray-600 text-sm italic">
+            Add tags to help readers find your work.
           </p>
         )}
       </div>

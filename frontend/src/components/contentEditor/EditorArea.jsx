@@ -33,7 +33,9 @@ const EditorArea = ({ editorRef, content, setContent }) => {
   useEffect(() => {
     const editor = editorRef?.current;
     if (editor && editor.innerHTML !== content) {
-      editor.innerHTML = content || "";
+      // Only update if significantly different to avoid cursor jumps
+      // Simple check: if empty, just set it.
+      if (!editor.innerHTML) editor.innerHTML = content || "";
     }
   }, [content, editorRef]);
 
@@ -83,7 +85,8 @@ const EditorArea = ({ editorRef, content, setContent }) => {
         spellCheck="false"
         dir="ltr"
         onInput={handleInput}
-        className="bg-[#241F1A] border border-[#2A2520] p-4 rounded-xl outline-none text-gray-200 leading-relaxed text-left min-h-[300px]"
+        data-placeholder="Start writing your story..."
+        className="bg-transparent border-none outline-none text-gray-200 text-lg leading-relaxed text-left min-h-[500px] empty:before:content-[attr(data-placeholder)] empty:before:text-gray-600 cursor-text prose prose-invert max-w-none"
         style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
       ></div>
     </div>

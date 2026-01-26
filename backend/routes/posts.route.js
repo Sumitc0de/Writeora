@@ -21,7 +21,7 @@ router.get("/:slug",getPostBySlug );
 router.post("/", protect, createPost);
 router.get("/category/:category", protect, getPostByCategory);
 
-router.post("/:slug/like", protect, toggleLikePostBySlug);
+router.post("/:slug/likes", protect, toggleLikePostBySlug);
 router.get("/:slug/likes", protect, getPostLikesBySlug);
 
 router.post("/:slug/comments", protect, addCommentBySlug);
