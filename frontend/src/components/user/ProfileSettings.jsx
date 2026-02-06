@@ -16,6 +16,9 @@ const ProfileSettings = () => {
   const [saveLoading, setSaveLoading] = useState({ name: false, bio: false });
   const [messages, setMessages] = useState({ name: "", bio: "", avatar: "" });
 
+
+  // console.log(messages)
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -46,7 +49,7 @@ const ProfileSettings = () => {
     setSaveLoading(prev => ({ ...prev, name: true }));
     try {
       const response = await updateUsername(formData.name);
-      setUser(response.user);
+      setUser(response.user); // Update global state
       showMessage("name", "Username updated successfully!");
     } catch (error) {
       showMessage("name", error.message || "Failed to update username", "error");
@@ -63,7 +66,7 @@ const ProfileSettings = () => {
     setSaveLoading(prev => ({ ...prev, bio: true }));
     try {
       const response = await updateBio(formData.bio);
-      setUser(response.user);
+      setUser(response.user); // Update global state
       showMessage("bio", "Bio updated successfully!");
     } catch (error) {
       showMessage("bio", error.message || "Failed to update bio", "error");
@@ -85,7 +88,7 @@ const ProfileSettings = () => {
 
       // Update user avatar via API
       const response = await updateAvatar(uploadedImage);
-      setUser(response.user);
+      setUser(response.user); // Update global state
       showMessage("avatar", "Avatar updated successfully!");
     } catch (error) {
       showMessage("avatar", error.message || "Failed to upload avatar", "error");
@@ -152,8 +155,8 @@ const ProfileSettings = () => {
 
         {messages.avatar && (
           <div className={`mt-4 p-3 rounded-lg flex items-center gap-2 text-sm ${messages.avatar.type === "success"
-              ? "bg-green-500/10 border border-green-500/20 text-green-400"
-              : "bg-red-500/10 border border-red-500/20 text-red-400"
+            ? "bg-green-500/10 border border-green-500/20 text-green-400"
+            : "bg-red-500/10 border border-red-500/20 text-red-400"
             }`}>
             {messages.avatar.type === "success" ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
             {messages.avatar.text}

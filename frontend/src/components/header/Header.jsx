@@ -13,6 +13,8 @@ function Header() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const dropdownRef = useRef(null);
 
+  // console.log(user)
+
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event) {
@@ -69,8 +71,8 @@ function Header() {
                 key={n.route}
                 to={n.route}
                 className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${isActive
-                    ? "bg-[#F5C542] text-black shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-white/[0.05]"
+                  ? "bg-[#F5C542] text-black shadow-lg"
+                  : "text-gray-400 hover:text-white hover:bg-white/[0.05]"
                   }`}
               >
                 {n.name}
@@ -106,9 +108,9 @@ function Header() {
               className="flex items-center gap-3 bg-white/[0.03] border border-white/[0.08] pl-2 pr-4 py-1.5 rounded-full hover:bg-white/[0.08] transition-all"
             >
               <img
-                src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name}&background=F5C542&color=000`}
+                src={user?.avatar.url || `https://ui-avatars.com/api/?name=${user?.name}&background=F5C542&color=000`}
                 alt="Profile"
-                className="w-8 h-8 rounded-full border border-white/10"
+                className="w-8 h-8 rounded-full border bg-contain border-white/10"
               />
               <span className="text-sm font-medium text-gray-200 max-w-[100px] truncate">
                 {user?.name || "User"}

@@ -1,188 +1,234 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Bell, Heart, MessageCircle, Bookmark, MoreHorizontal, UserCheck, MapPin, Link as LinkIcon, Calendar, Loader } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { UserCheck, MapPin, Link as LinkIcon, Calendar, Loader, Sparkles, LayoutGrid, BookmarkCheck, Heart, Eye, FileText, ArrowRight } from 'lucide-react';
 import Background from "../../src/components/Background";
-import { motion } from "framer-motion";
-import { usePosts } from "../../src/context/PostContext";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../src/context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
+import { getUserSavedPosts, getUserStats, getUserStatsById } from "../../src/service/postEngagement";
+import { getAllPosts } from "../../src/service/postService";
+import { getPublicProfile } from "../../src/service/userService";
+import ContentCard from "../../src/components/ContentCard";
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState('Stories');
-  const { posts, loading } = usePosts();
-  const { user } = useAuth();
+  const { userId } = useParams();
+  const [activeTab, setActiveTab] = useState('My Posts');
+  const { user: currentUser } = useAuth();
   const navigate = useNavigate();
 
-  // Filter posts by current logged-in user
-  const userPosts = posts.filter(post => post.author?._id === user?._id || post.author?.name === user?.name);
+  const [profileUser, setProfileUser] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [savedPosts, setSavedPosts] = useState([]);
+  const [stats, setStats] = useState({ totalPosts: 0, totalLikes: 0, totalViews: 0 });
+  const [loading, setLoading] = useState(true);
 
-  // Calculate stats
-  const totalViews = userPosts.reduce((sum, post) => sum + (post.views || 0), 0);
-  const totalLikes = userPosts.reduce((sum, post) => sum + (post.likes || 0), 0);
+  const isOwnProfile = !userId || userId === currentUser?._id;
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const targetUserId = userId || currentUser?._id;
+
+      const fetchProfile = isOwnProfile
+        ? Promise.resolve({ user: currentUser })
+        : getPublicProfile(userId);
+
+      const fetchStats = isOwnProfile
+        ? getUserStats()
+        : getUserStatsById(userId);
+
+      const [profileRes, allPostsRes, statsRes, savedRes] = await Promise.all([
+        fetchProfile,
+        getAllPosts(),
+        fetchStats,
+        isOwnProfile ? getUserSavedPosts() : Promise.resolve({ data: { posts: [] } })
+      ]);
+
+      setProfileUser(profileRes.user);
+
+      // Filter posts by the target user ID
+      const targetPosts = (allPostsRes.posts || allPostsRes).filter(p => p.author?._id === targetUserId);
+
+      setPosts(targetPosts);
+      setSavedPosts(savedRes.data?.posts || []);
+      setStats(statsRes.data?.stats || { totalPosts: 0, totalLikes: 0, totalViews: 0 });
+    } catch (err) {
+      console.error("Profile Fetch Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, currentUser, isOwnProfile]);
+
+  useEffect(() => {
+    if (currentUser?._id || userId) fetchData();
+  }, [userId, currentUser?._id, fetchData]);
+
+  const displayedPosts = activeTab === 'My Posts' ? posts : savedPosts;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader className="w-12 h-12 text-[#F5C542] animate-spin" />
+          <p className="text-gray-500 animate-pulse font-medium">Synchronizing Profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const tabs = isOwnProfile
+    ? [{ id: 'My Posts', icon: LayoutGrid }, { id: 'Saved Posts', icon: BookmarkCheck }]
+    : [{ id: 'My Posts', icon: LayoutGrid }];
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white pt-20 pb-20 relative overflow-hidden">
+    <div className="min-h-screen bg-[#050505] text-white pt-24 pb-32 relative selection:bg-[#F5C542] selection:text-black">
       <Background />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
+        {/* ✨ Profile Header & Banner */}
+        <div className="relative mb-12">
+          <div className="h-64 rounded-[2rem] bg-gradient-to-br from-[#1A1A1A] via-[#0D0D0D] to-[#1A1A1A] border border-white/5 overflow-hidden shadow-2xl relative">
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#050505]/80 to-transparent" />
+          </div>
 
-        {/* Banner */}
-        <div className="h-48 md:h-64 rounded-t-3xl bg-gradient-to-r from-[#1A1A1A] to-[#2A2A2A] relative overflow-hidden border-x border-t border-white/[0.05]">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] to-transparent opacity-80"></div>
-        </div>
-
-        {/* Profile Card */}
-        <div className="bg-[#0F0D0A]/80 backdrop-blur-xl border border-white/[0.08] rounded-b-3xl p-6 md:p-10 -mt-1 shadow-2xl mb-12 relative overflow-hidden">
-          <div className="flex flex-col md:flex-row gap-8 items-start relative z-10">
-            {/* Avatar */}
-            <div className="-mt-20 md:-mt-24">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#050505] bg-[#1A1A1A] overflow-hidden shadow-2xl relative group">
-                <img src={user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'User'}`} alt="Avatar" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                  <span className="text-xs font-bold uppercase tracking-wider">Change</span>
-                </div>
+          <div className="absolute -bottom-8 left-10 flex flex-col md:flex-row items-end gap-6 w-[calc(100%-80px)]">
+            <div className="relative group">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl border-4 border-[#050505] bg-[#1A1A1A] overflow-hidden shadow-2xl relative">
+                <img
+                  src={profileUser?.avatar?.url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileUser?.name}`}
+                  alt="Avatar"
+                  className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                />
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-[#F5C542] rounded-xl flex items-center justify-center border-4 border-[#050505] shadow-lg">
+                <Sparkles size={14} fill="black" />
               </div>
             </div>
 
-            {/* Info */}
-            <div className="flex-1 pt-2">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div className="flex-1 pb-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-white mb-1 flex items-center gap-2">
-                    {user?.name || "User"}
-                    <span className="w-5 h-5 bg-[#F5C542] rounded-full flex items-center justify-center text-black text-[10px]" title="Member">✔</span>
+                  <h1 className="text-3xl md:text-4xl font-black text-white mb-2 flex items-center gap-3">
+                    {profileUser?.name}
+                    <UserCheck className="text-[#F5C542]" size={24} />
                   </h1>
-                  <p className="text-[#F5C542] font-medium">{user?.role || "Content Creator"}</p>
+                  <p className="text-[#F5C542] font-black uppercase tracking-[0.2em] text-xs opacity-80 mb-4">
+                    {profileUser?.role || "Verified Creator"}
+                  </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => navigate('/settings')}
-                    className="px-5 py-2 rounded-lg border border-white/10 text-white font-medium hover:bg-white/5 transition-colors flex items-center gap-2"
-                  >
-                    Edit Profile
-                  </button>
-                </div>
+                {isOwnProfile && (
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => navigate('/settings')} className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 hover:border-[#F5C542]/30 transition-all">
+                      Edit Profile
+                    </button>
+                  </div>
+                )}
               </div>
 
-              <p className="text-gray-400 leading-relaxed max-w-2xl mb-6">
-                {user?.bio || "Welcome to my profile! I'm passionate about sharing knowledge and insights."}
+              <p className="text-gray-400  leading-relaxed max-w-xl  text-sm italic">
+                "{profileUser?.bio || "Crafting digital stories and exploring the boundaries of creativity."}"
               </p>
-
-              <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500">
-                <span className="flex items-center gap-2"><MapPin size={16} /> {user?.location || "Remote"}</span>
-                {user?.website && <span className="flex items-center gap-2"><LinkIcon size={16} className="text-[#F5C542]" /> <a href={user.website} target="_blank" rel="noopener noreferrer" className="hover:underline">{user.website}</a></span>}
-                <span className="flex items-center gap-2"><Calendar size={16} /> Joined {new Date(user?.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
-              </div>
             </div>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-px bg-white/10 rounded-xl overflow-hidden mt-8 border border-white/5">
-            {[
-              { label: 'Posts', value: userPosts.length },
-              { label: 'Total Likes', value: totalLikes },
-              { label: 'Total Views', value: totalViews > 1000 ? `${(totalViews / 1000).toFixed(1)}K` : totalViews }
-            ].map((stat) => (
-              <div key={stat.label} className="bg-[#1A1A1A]/50 p-4 text-center hover:bg-white/[0.05] transition-colors cursor-default">
-                <div className="text-xl font-bold text-white">{stat.value}</div>
-                <div className="text-[10px] uppercase tracking-widest text-gray-500 font-medium">{stat.label}</div>
-              </div>
-            ))}
           </div>
         </div>
 
-        {/* Content Tabs */}
-        <div className="flex items-center gap-8 border-b border-white/10 mb-8 px-2">
-          {['Stories', 'About', 'Saved'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-4 text-sm font-bold uppercase tracking-wider transition-all relative ${activeTab === tab ? "text-[#F5C542]" : "text-gray-500 hover:text-gray-300"
-                }`}
+        {/* 📊 Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 mt-20 md:mt-12">
+          {[
+            { label: isOwnProfile ? 'Published Stories' : 'Stories Published', value: stats.totalPosts || 0, icon: FileText, color: 'text-blue-400' },
+            { label: 'Reader Appreciation', value: stats.totalLikes || 0, icon: Heart, color: 'text-red-400' },
+            { label: 'Total Engagement', value: (stats.totalViews || 0) > 1000 ? `${((stats.totalViews || 0) / 1000).toFixed(1)}K` : (stats.totalViews || 0), icon: Eye, color: 'text-[#F5C542]' }
+          ].map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-[#1A1A1A]/30 border border-white/5 rounded-3xl p-6 backdrop-blur-md group hover:border-[#F5C542]/20 transition-all"
             >
-              {tab}
-              {activeTab === tab && (
-                <motion.div layoutId="tabIndicator" className="absolute bottom-0 left-0 w-full h-0.5 bg-[#F5C542]" />
-              )}
-            </button>
+              <div className="flex items-center gap-4">
+                <div className={`p-4 rounded-2xl bg-white/[0.02] border border-white/5 ${stat.color} group-hover:scale-110 transition-transform`}>
+                  <stat.icon size={20} />
+                </div>
+                <div>
+                  <div className="text-2xl font-black text-white">{stat.value}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">{stat.label}</div>
+                </div>
+              </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Stories Grid */}
-        {loading ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-4">
-            <Loader className="w-8 h-8 animate-spin text-[#F5C542]" />
-            <p className="text-gray-500 animate-pulse">Loading your stories...</p>
-          </div>
-        ) : userPosts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-center">
-            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
-              <MessageCircle size={32} className="text-gray-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-300">No stories yet</h3>
-            <p className="text-gray-500 max-w-xs mt-2 mb-6">
-              Start writing to share your thoughts with the world.
-            </p>
-            <button
-              onClick={() => navigate('/create/write')}
-              className="px-6 py-3 bg-[#F5C542] text-black rounded-lg font-bold hover:bg-[#ffdb75] transition-colors"
-            >
-              Start Writing
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {userPosts.map((story) => (
-              <motion.article
-                key={story._id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="group bg-[#1A1A1A]/40 border border-white/5 rounded-2xl p-6 hover:border-[#F5C542]/30 transition-all flex flex-col md:flex-row gap-6 cursor-pointer"
-                onClick={() => navigate(`/post/${story.slug}`)}
+        {/* 📚 Navigation & Filtering */}
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 pb-4 border-b border-white/5">
+          <div className="flex items-center gap-8 px-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === tab.id ? "text-[#F5C542]" : "text-gray-500 hover:text-white"
+                  }`}
               >
-                <div className="flex-1 order-2 md:order-1 flex flex-col">
-                  <div className="flex items-center gap-3 mb-3 text-xs">
-                    <span className="px-2 py-1 rounded bg-white/5 text-[#F5C542] font-semibold">{story.category || "General"}</span>
-                    <span className="text-gray-500">{story.readingTime || 5} min read</span>
-                    <span className="text-gray-500">{new Date(story.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                  </div>
-                  <h2 className="text-2xl font-bold text-white mb-3 group-hover:text-[#F5C542] transition-colors leading-tight">
-                    {story.title}
-                  </h2>
-                  <p className="text-gray-400 leading-relaxed mb-6 line-clamp-2">
-                    {story.subtitle || story.description || ""}
-                  </p>
-
-                  <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2 text-gray-500 text-sm group-hover:text-red-400 transition-colors">
-                        <Heart size={16} /> {story.likes || 0}
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-500 text-sm group-hover:text-blue-400 transition-colors">
-                        <MessageCircle size={16} /> {story.comments?.length || 0}
-                      </div>
-                    </div>
-                    <div className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Bookmark size={18} className="hover:text-[#F5C542]" />
-                    </div>
-                  </div>
-                </div>
-
-                {story.headerImage?.url && (
-                  <div className="w-full md:w-64 h-48 md:h-auto order-1 md:order-2 rounded-xl overflow-hidden relative">
-                    <img
-                      src={story.headerImage.url}
-                      alt={story.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
-                    />
-                  </div>
+                <tab.icon size={14} />
+                {tab.id}
+                {activeTab === tab.id && (
+                  <motion.div layoutId="profileTab" className="absolute bottom-[-1px] left-0 w-full h-0.5 bg-[#F5C542]" />
                 )}
-              </motion.article>
+              </button>
             ))}
           </div>
-        )}
+        </div>
 
+        {/* 🖼️ Projects Display */}
+        <AnimatePresence mode="wait">
+          {displayedPosts.length > 0 ? (
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {displayedPosts.map((post, idx) => (
+                <ContentCard key={post._id} {...post} idx={idx} />
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center py-20 text-center"
+            >
+              <div className="w-20 h-20 rounded-full bg-white/[0.03] border border-white/5 flex items-center justify-center mb-6">
+                <FileText size={32} className="text-gray-700" />
+              </div>
+              <h3 className="text-xl font-black text-gray-300 mb-2">Workspace Empty</h3>
+              <p className="text-gray-500 max-w-xs mb-8">
+                {activeTab === 'My Posts'
+                  ? (isOwnProfile ? "You haven't published any insights yet." : `${profileUser?.name} hasn't published any stories yet.`)
+                  : "You haven't bookmarked any articles yet."}
+              </p>
+              {isOwnProfile && (
+                activeTab === 'My Posts' ? (
+                  <button
+                    onClick={() => navigate('/create')}
+                    className="px-8 py-3 bg-[#F5C542] text-black rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#ffdb75] transition-all flex items-center gap-2 group"
+                  >
+                    Create Now
+                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => navigate('/discover')}
+                    className="px-8 py-3 bg-white/5 border border-white/10 rounded-xl font-black text-xs uppercase tracking-widest hover:border-[#F5C542] transition-all"
+                  >
+                    Explore Content
+                  </button>
+                )
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

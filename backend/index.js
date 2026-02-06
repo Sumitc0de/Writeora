@@ -11,6 +11,7 @@ const connectDB = require('./config/db');
 const userRoutes = require('./routes/user.route'); // ✅ your user routes
 const postRoutes = require("./routes/posts.route")
 const uploadRoutes = require('./routes/upload.route')
+const aiRoutes = require('./routes/ai.route')
 // Middlewares
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
@@ -30,14 +31,15 @@ connectDB();
 
 // Test Route
 app.get('/', (req, res) => {
-    res.send("Welcome to server");
+  res.send("Welcome to server");
 });
 
 // API Routes
 app.use('/api/user', userRoutes); // ✅ attach routes
 app.use('/api/posts', postRoutes)
 app.use('/api/upload', uploadRoutes)
+app.use('/api/ai', aiRoutes)
 // Start Server
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running at http://localhost:${port}`);
 });

@@ -7,19 +7,29 @@ const {
   getPostByCategory
 } = require("../controllers/post.controller");
 
-const {toggleLikePostBySlug, getPostLikesBySlug, addCommentBySlug, getCommentBySlug, toggleSaveBySlug, getSaveStatusBySlug
-
+const {
+  toggleLikePostBySlug,
+  getPostLikesBySlug,
+  addCommentBySlug,
+  getCommentBySlug,
+  toggleSaveBySlug,
+  getSaveStatusBySlug,
+  getUserSavedPosts,
+  getUserStats
 } = require("../controllers/postEngagement.controller")
 const protect = require("../middlewares/authmiddleware")
 
 // ✅ Public
 router.get("/", getAllPosts);
-router.get("/:slug",getPostBySlug );
-
+router.get("/:slug", getPostBySlug);
 
 // ✅ Protected
 router.post("/", protect, createPost);
 router.get("/category/:category", protect, getPostByCategory);
+
+router.get("/user/saved", protect, getUserSavedPosts);
+router.get("/user/stats", protect, getUserStats);
+router.get("/user/stats/:userId", protect, getUserStats);
 
 router.post("/:slug/likes", protect, toggleLikePostBySlug);
 router.get("/:slug/likes", protect, getPostLikesBySlug);

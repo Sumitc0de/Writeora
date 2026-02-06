@@ -1,10 +1,25 @@
 import React from "react";
 import {
-  Bold, Italic, Underline, List, ListOrdered, Quote, Code, Heading1, Heading2, Link as LinkIcon
+  Bold, Italic, Underline, List, ListOrdered, Quote, Code, Heading1, Heading2, Link as LinkIcon, Type, Eraser
 } from "lucide-react";
 
 export default function Toolbar({ editorRef }) {
   const applyFormat = (command, value = null) => {
+    if (command === "formatBlock") {
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        let parent = selection.getRangeAt(0).commonAncestorContainer;
+        while (parent && parent !== editorRef.current) {
+          if (parent.nodeName === value.toUpperCase()) {
+            // Already in this block, toggle it off to paragraph
+            document.execCommand("formatBlock", false, "P");
+            if (editorRef.current) editorRef.current.focus();
+            return;
+          }
+          parent = parent.parentNode;
+        }
+      }
+    }
     document.execCommand(command, false, value);
     if (editorRef.current) {
       editorRef.current.focus();
@@ -12,9 +27,23 @@ export default function Toolbar({ editorRef }) {
   };
 
   const addLink = () => {
-    const url = prompt("Enter the URL:");
-    if (url) {
-      applyFormat("createLink", url);
+    const selection = window.getSelection();
+    const hasSelection = selection.rangeCount > 0 && selection.toString().trim().length > 0;
+
+    if (hasSelection) {
+      const url = prompt("Enter the URL:");
+      if (url) {
+        const selectedText = selection.toString();
+        const html = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#F5C542] underline hover:opacity-80 transition-opacity">${selectedText}</a>`;
+        document.execCommand("insertHTML", false, html);
+      }
+    } else {
+      const text = prompt("Enter Link Label (Text):");
+      const url = prompt("Enter the URL:");
+      if (text && url) {
+        const html = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#F5C542] underline hover:opacity-80 transition-opacity">${text}</a>`;
+        document.execCommand("insertHTML", false, html);
+      }
     }
   };
 
@@ -38,6 +67,10 @@ export default function Toolbar({ editorRef }) {
         <ToolButton onClick={() => applyFormat("insertOrderedList")} icon={<ListOrdered size={18} />} tooltip="Numbered List" />
         <ToolButton onClick={() => applyFormat("formatBlock", "blockquote")} icon={<Quote size={18} />} tooltip="Quote" />
         <ToolButton onClick={() => applyFormat("formatBlock", "pre")} icon={<Code size={18} />} tooltip="Code Block" />
+
+        <div className="w-px h-5 bg-white/10 mx-1" />
+        <ToolButton onClick={() => applyFormat("formatBlock", "P")} icon={<Type size={18} />} tooltip="Normal Text" />
+        <ToolButton onClick={() => applyFormat("removeFormat")} icon={<Eraser size={18} />} tooltip="Clear Formatting" />
 
       </div>
     </div>

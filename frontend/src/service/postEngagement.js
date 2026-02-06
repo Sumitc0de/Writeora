@@ -32,3 +32,12 @@ export const toggleLikePost = (slug) =>
 // Get total likes and like status 
 export const getLikeStatus = (slug) =>
   api.get(`/posts/${slug}/likes`);
+
+// Get user saved posts
+export const getUserSavedPosts = () => api.get(`/posts/user/saved`);
+
+// Get user stats
+export const getUserStats = () => api.get(`/posts/user/stats`);
+
+// Get user stats by ID (Public)
+export const getUserStatsById = (userId) => api.get(`/posts/user/stats/${userId}`);

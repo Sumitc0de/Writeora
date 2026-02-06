@@ -9,7 +9,8 @@ const {
   updateBio,
   updateAvatar,
   deleteProfile,
-  getUserSettings
+  getUserSettings,
+  getPublicProfile
 } = require("../controllers/user.controller");
 const protect = require("../middlewares/authmiddleware");
 
@@ -20,10 +21,12 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 
-// Protected routes
+// Profile Fetching
 router.get("/profile", protect, (req, res) => {
   res.json({ user: req.user });
 });
+
+router.get("/author/:id", protect, getPublicProfile);
 
 // Settings routes (all protected)
 router.get("/settings", protect, getUserSettings);

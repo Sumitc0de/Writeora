@@ -287,6 +287,71 @@ const getSaveStatusBySlug = async (req, res) => {
   }
 };
 
+/**
+ * =====================================================
+ * GET SAVED POSTS FOR LOGGED IN USER (AUTH REQUIRED)
+ * =====================================================
+ */
+const getUserSavedPosts = async (req, res) => {
+  try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const savedRecords = await Saves.find({ user: req.user._id })
+      .populate({
+        path: "post",
+        populate: { path: "author", select: "name avatar" }
+      })
+      .sort({ createdAt: -1 });
+
+    const posts = savedRecords.map(record => record.post).filter(post => post !== null);
+
+    return res.status(200).json({ success: true, posts });
+  } catch (error) {
+    console.error("❌ Get Saved Posts Error:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch saved posts" });
+  }
+};
+
+/**
+ * =====================================================
+ * GET AGGREGATED USER STATS (AUTH REQUIRED)
+ * =====================================================
+ */
+const getUserStats = async (req, res) => {
+  try {
+    const userId = req.params.userId || req.user._id;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID required" });
+    }
+
+    // 1. Total Posts
+    const userPosts = await Posts.find({ author: userId });
+    const totalPosts = userPosts.length;
+
+    // 2. Total Likes (Sum of all likes on user's posts)
+    const postIds = userPosts.map(p => p._id);
+    const totalLikes = await Like.countDocuments({ post: { $in: postIds } });
+
+    // 3. Total Views (Sum of views on all posts)
+    const totalViews = userPosts.reduce((sum, post) => sum + (post.views || 0), 0);
+
+    return res.status(200).json({
+      success: true,
+      stats: {
+        totalPosts,
+        totalLikes,
+        totalViews
+      }
+    });
+  } catch (error) {
+    console.error("❌ Get User Stats Error:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch stats" });
+  }
+};
+
 module.exports = {
   toggleLikePostBySlug,
   getPostLikesBySlug,
@@ -294,4 +359,6 @@ module.exports = {
   getCommentBySlug,
   toggleSaveBySlug,
   getSaveStatusBySlug,
+  getUserSavedPosts,
+  getUserStats
 };

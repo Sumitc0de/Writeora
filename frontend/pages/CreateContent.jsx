@@ -26,7 +26,7 @@ export default function CreateContent() {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed mb-10">
-            Unleash your creativity with our AI-powered suite. Whether it's a blog, a technical guide, or personal notes, we've got you covered.
+            Unleash your creativity with our suite of smart templates. From tech deep-dives to step-by-step guides, start your journey here.
           </p>
 
           <button
@@ -39,43 +39,66 @@ export default function CreateContent() {
       </div>
 
       {/* OPTIONS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 relative z-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-24 relative z-10">
         <OptionCard
           icon={<PenLine />}
-          title="Blog Post"
-          desc="Share your thoughts and stories with a global audience."
+          title="Tech Blog"
+          desc="Standard structure for tech reviews, news, and insights."
           delay={0.1}
+          templateType="blog"
+          navigate={navigate}
         />
         <OptionCard
-          icon={<FileText />}
-          title="Technical Article"
-          desc="In-depth documentation with code blocks and diagrams."
+          icon={<Sparkles />}
+          title="Think Piece"
+          desc="Expressive, philosophical layout for long-form opinions."
           delay={0.2}
+          templateType="article"
+          navigate={navigate}
         />
         <OptionCard
           icon={<BookOpen />}
-          title="Knowledge Base"
-          desc="Create structured learning guides and educational sets."
+          title="Step-by-Step Tutorial"
+          desc="Detailed guides with code blocks and structured steps."
           delay={0.3}
+          templateType="learning"
+          navigate={navigate}
+        />
+        <OptionCard
+          icon={<FileText />}
+          title="Knowledge Base"
+          desc="Internal SOPs and documentation for your team."
+          delay={0.4}
+          templateType="knowledge_base"
+          navigate={navigate}
         />
       </div>
     </div>
   );
 }
 
-function OptionCard({ icon, title, desc, delay }) {
+function OptionCard({ icon, title, desc, delay, templateType, navigate }) {
+  const handleClick = () => {
+    navigate('/create/write', { state: { templateType } });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay }}
-      className="group p-8 rounded-3xl bg-[#1A1A1A]/50 border border-white/[0.08] hover:bg-white/[0.05] hover:border-[#F5C542]/30 backdrop-blur-sm transition-all duration-300 cursor-default"
+      onClick={handleClick}
+      className="group p-8 rounded-3xl bg-[#1A1A1A]/50 border border-white/[0.08] hover:bg-white/[0.05] hover:border-[#F5C542]/30 backdrop-blur-sm transition-all duration-300 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
     >
       <div className="w-14 h-14 rounded-2xl bg-[#F5C542]/10 border border-[#F5C542]/20 text-[#F5C542] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
         <div className="w-6 h-6">{icon}</div>
       </div>
       <h3 className="text-xl font-bold mb-3 text-white group-hover:text-[#F5C542] transition-colors">{title}</h3>
       <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
+      <div className="mt-4 flex items-center gap-2 text-xs text-[#F5C542] opacity-0 group-hover:opacity-100 transition-opacity">
+        <span>Start writing</span>
+        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+      </div>
     </motion.div>
   );
 }

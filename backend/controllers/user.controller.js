@@ -34,6 +34,8 @@ const registerUser = async (req, res) => {
         _id: newUser._id,
         name: newUser.name,
         email: newUser.email,
+        avatar: newUser.avatar,
+        bio: newUser.bio,
       },
     });
   } catch (error) {
@@ -75,6 +77,8 @@ const loginUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        avatar: user.avatar,
+        bio: user.bio,
       },
     });
   } catch (error) {
@@ -322,6 +326,23 @@ const getUserSettings = async (req, res) => {
   }
 };
 
+// Get Public Profile Info
+const getPublicProfile = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).select('-password -resetPasswordToken -resetPasswordExpire -email');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("getPublicProfile error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -332,5 +353,6 @@ module.exports = {
   updateBio,
   updateAvatar,
   deleteProfile,
-  getUserSettings
+  getUserSettings,
+  getPublicProfile
 };

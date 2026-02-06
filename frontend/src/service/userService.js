@@ -135,3 +135,23 @@ export const getUserSettings = async () => {
         throw error;
     }
 };
+// Get Public Profile
+export const getPublicProfile = async (id) => {
+    try {
+        const res = await fetch(`${API_BASE}/author/${id}`, {
+            method: "GET",
+            credentials: "include",
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.message || "Failed to fetch profile");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("getPublicProfile error:", error);
+        throw error;
+    }
+};

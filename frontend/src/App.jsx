@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-route
 import { AuthProvider } from "./context/AuthContext";
 import { PostProvider } from "./context/PostContext";
 
+import { Toaster } from "react-hot-toast";
 import ScrollToTop from "./components/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PageWrapper from "./components/transition/PageWrapper";
@@ -30,10 +31,11 @@ function AppContent() {
 
   return (
     <>
+      <Toaster position="top-center" reverseOrder={false} />
       <ScrollToTop />
-      <ScrollToTopButton/>
+      <ScrollToTopButton />
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {/* Full screen fade transition */}
         <FadeTransition key={"glow-" + location.pathname} />
 
@@ -60,7 +62,7 @@ function AppContent() {
 
           {/* LAYOUT ROUTES */}
           <Route path="/" element={<Layout />}>
-            
+
             {/* Public routes */}
             <Route
               index
@@ -114,6 +116,17 @@ function AppContent() {
 
             <Route
               path="profile"
+              element={
+                <ProtectedRoute>
+                  <PageWrapper>
+                    <Profile />
+                  </PageWrapper>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="profile/:userId"
               element={
                 <ProtectedRoute>
                   <PageWrapper>
