@@ -1,65 +1,42 @@
 // Importing models
 const Posts = require("../models/posts.model");
-const Like = require("../models/likes.model");
-const Comment = require("../models/comment.model");
 const Saves = require("../models/save.model");
+const User = require("../models/users.model");
 
 /**
  * =====================================================
- * LIKE / UNLIKE A POST (AUTH REQUIRED)
+ * TOGGLE LIKE ON A POST BY SLUG (AUTH REQUIRED)
  * =====================================================
  */
 const toggleLikePostBySlug = async (req, res) => {
   try {
-    if (!req.user || !req.user._id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
-
-    const userId = req.user._id;
     const { slug } = req.params;
+    const userId = req.user._id;
 
     const post = await Posts.findOne({ slug });
+
     if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: "Post not found",
-      });
+      return res.status(404).json({ success: false, message: "Post not found" });
     }
 
-    const existingLike = await Like.findOne({
-      user: userId,
-      post: post._id,
-    });
+    const likeIndex = post.likes.indexOf(userId);
 
-    if (existingLike) {
-      await Like.deleteOne({ _id: existingLike._id });
+    if (likeIndex === -1) {
+      post.likes.push(userId);
     } else {
-      try {
-        await Like.create({
-          user: userId,
-          post: post._id,
-        });
-      } catch (err) {
-        if (err.code !== 11000) throw err;
-      }
+      post.likes.splice(likeIndex, 1);
     }
 
-    const totalLikes = await Like.countDocuments({ post: post._id });
+    await post.save();
 
     return res.status(200).json({
       success: true,
-      liked: !existingLike,
-      totalLikes,
+      likesCount: post.likes.length,
+      isLiked: likeIndex === -1,
     });
   } catch (error) {
     console.error("❌ Toggle Like Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to toggle like",
-    });
+    return res.status(500).json({ success: false, message: "Failed to toggle like" });
   }
 };
 
@@ -74,34 +51,24 @@ const getPostLikesBySlug = async (req, res) => {
 
     const post = await Posts.findOne({ slug });
     if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: "Post not found",
-      });
+      return res.status(404).json({ success: false, message: "Post not found" });
     }
 
-    const totalLikes = await Like.countDocuments({ post: post._id });
+    const likesCount = post.likes.length;
+    let isLiked = false;
 
-    let liked = false;
     if (req.user && req.user._id) {
-      const userLike = await Like.findOne({
-        user: req.user._id,
-        post: post._id,
-      });
-      liked = !!userLike;
+      isLiked = post.likes.includes(req.user._id);
     }
 
     return res.status(200).json({
       success: true,
-      liked,
-      totalLikes,
+      likesCount,
+      isLiked,
     });
   } catch (error) {
     console.error("❌ Get Likes Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch likes",
-    });
+    return res.status(500).json({ success: false, message: "Failed to fetch likes" });
   }
 };
 
@@ -112,47 +79,37 @@ const getPostLikesBySlug = async (req, res) => {
  */
 const addCommentBySlug = async (req, res) => {
   try {
-    if (!req.user || !req.user._id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
-
     const { slug } = req.params;
     const { text } = req.body;
 
     if (!text || !text.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Comment text is required",
-      });
+      return res.status(400).json({ success: false, message: "Comment text is required" });
     }
 
     const post = await Posts.findOne({ slug });
     if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: "Post not found",
-      });
+      return res.status(404).json({ success: false, message: "Post not found" });
     }
 
-    const comment = await Comment.create({
-      post: post._id,
+    const newComment = {
       user: req.user._id,
       text: text.trim(),
-    });
+    };
+
+    post.comments.push(newComment);
+    await post.save();
+
+    // Get the added comment with user info
+    const updatedPost = await Posts.findOne({ slug }).populate("comments.user", "name avatar");
+    const addedComment = updatedPost.comments[updatedPost.comments.length - 1];
 
     return res.status(201).json({
       success: true,
-      comment,
+      comment: addedComment,
     });
   } catch (error) {
     console.error("❌ Add Comment Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to add comment",
-    });
+    return res.status(500).json({ success: false, message: "Failed to add comment" });
   }
 };
 
@@ -165,28 +122,18 @@ const getCommentBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
 
-    const post = await Posts.findOne({ slug });
+    const post = await Posts.findOne({ slug }).populate("comments.user", "name avatar");
     if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: "Post not found",
-      });
+      return res.status(404).json({ success: false, message: "Post not found" });
     }
-
-    const comments = await Comment.find({ post: post._id })
-      .populate("user", "name avatar")
-      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,
-      comments,
+      comments: post.comments.sort((a, b) => b.createdAt - a.createdAt),
     });
   } catch (error) {
     console.error("❌ Get Comments Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch comments",
-    });
+    return res.status(500).json({ success: false, message: "Failed to fetch comments" });
   }
 };
 
@@ -197,51 +144,29 @@ const getCommentBySlug = async (req, res) => {
  */
 const toggleSaveBySlug = async (req, res) => {
   try {
-    if (!req.user || !req.user._id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
-
     const { slug } = req.params;
     const userId = req.user._id;
 
     const post = await Posts.findOne({ slug });
     if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: "Post not found",
-      });
+      return res.status(404).json({ success: false, message: "Post not found" });
     }
 
-    const existingSave = await Saves.findOne({
-      user: userId,
-      post: post._id,
-    });
+    const existingSave = await Saves.findOne({ user: userId, post: post._id });
 
     if (existingSave) {
       await Saves.deleteOne({ _id: existingSave._id });
     } else {
-      await Saves.create({
-        user: userId,
-        post: post._id,
-      });
+      await Saves.create({ user: userId, post: post._id });
     }
-
-    const totalSaves = await Saves.countDocuments({ post: post._id });
 
     return res.status(200).json({
       success: true,
-      saved: !existingSave,
-      totalSaves,
+      isSaved: !existingSave,
     });
   } catch (error) {
     console.error("❌ Save Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to toggle save",
-    });
+    return res.status(500).json({ success: false, message: "Failed to toggle save" });
   }
 };
 
@@ -256,34 +181,22 @@ const getSaveStatusBySlug = async (req, res) => {
 
     const post = await Posts.findOne({ slug });
     if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: "Post not found",
-      });
+      return res.status(404).json({ success: false, message: "Post not found" });
     }
 
-    const totalSaves = await Saves.countDocuments({ post: post._id });
-
-    let saved = false;
+    let isSaved = false;
     if (req.user && req.user._id) {
-      const savedPost = await Saves.findOne({
-        user: req.user._id,
-        post: post._id,
-      });
-      saved = !!savedPost;
+      const savedPost = await Saves.findOne({ user: req.user._id, post: post._id });
+      isSaved = !!savedPost;
     }
 
     return res.status(200).json({
       success: true,
-      saved,
-      totalSaves,
+      isSaved,
     });
   } catch (error) {
     console.error("❌ Get Save Status Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch save status",
-    });
+    return res.status(500).json({ success: false, message: "Failed to fetch save status" });
   }
 };
 
@@ -294,18 +207,14 @@ const getSaveStatusBySlug = async (req, res) => {
  */
 const getUserSavedPosts = async (req, res) => {
   try {
-    if (!req.user || !req.user._id) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
-
     const savedRecords = await Saves.find({ user: req.user._id })
       .populate({
         path: "post",
-        populate: { path: "author", select: "name avatar" }
+        populate: { path: "author", select: "name avatar" },
       })
       .sort({ createdAt: -1 });
 
-    const posts = savedRecords.map(record => record.post).filter(post => post !== null);
+    const posts = savedRecords.map((record) => record.post).filter((post) => post !== null);
 
     return res.status(200).json({ success: true, posts });
   } catch (error) {
@@ -327,15 +236,13 @@ const getUserStats = async (req, res) => {
       return res.status(400).json({ success: false, message: "User ID required" });
     }
 
-    // 1. Total Posts
     const userPosts = await Posts.find({ author: userId });
     const totalPosts = userPosts.length;
 
-    // 2. Total Likes (Sum of all likes on user's posts)
-    const postIds = userPosts.map(p => p._id);
-    const totalLikes = await Like.countDocuments({ post: { $in: postIds } });
+    // Total Likes across all posts
+    const totalLikes = userPosts.reduce((sum, post) => sum + (post.likes?.length || 0), 0);
 
-    // 3. Total Views (Sum of views on all posts)
+    // Total Views across all posts
     const totalViews = userPosts.reduce((sum, post) => sum + (post.views || 0), 0);
 
     return res.status(200).json({
@@ -343,12 +250,32 @@ const getUserStats = async (req, res) => {
       stats: {
         totalPosts,
         totalLikes,
-        totalViews
-      }
+        totalViews,
+      },
     });
   } catch (error) {
     console.error("❌ Get User Stats Error:", error);
     return res.status(500).json({ success: false, message: "Failed to fetch stats" });
+  }
+};
+
+/**
+ * =====================================================
+ * GET MY POSTS (AUTH REQUIRED)
+ * =====================================================
+ */
+const getMyPosts = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const posts = await Posts.find({ author: userId })
+      .sort({ createdAt: -1 })
+      .populate("author", "name email avatar")
+      .lean();
+
+    return res.status(200).json({ success: true, posts });
+  } catch (error) {
+    console.error("❌ Get My Posts Error:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch your posts" });
   }
 };
 
@@ -360,5 +287,6 @@ module.exports = {
   toggleSaveBySlug,
   getSaveStatusBySlug,
   getUserSavedPosts,
-  getUserStats
+  getUserStats,
+  getMyPosts,
 };

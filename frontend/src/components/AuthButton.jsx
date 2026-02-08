@@ -2,25 +2,25 @@
 import Button from "./Button";
 
 const AuthButton = ({ handleLogin, handleSignup }) => (
-  <div className="flex items-center gap-4">
-    
-      <div className="hidden sm:block">
-        <Button
-          onClick={handleLogin}
-          className="relative px-5 py-2.5 rounded-lg font-medium text-black 
+  <div className="flex items-center gap-2 sm:gap-4">
+
+    <div className="block sm:hidden">
+      <Button
+        onClick={handleLogin}
+        className="relative px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg font-medium text-black text-sm
                      border border-yellow-400 bg-yellow-500 
                      hover:bg-yellow-600/30 hover:border-yellow-300
                      hover:shadow-[0_0_12px_rgba(234,179,8,0.6)] 
                      transition-all duration-300"
-        >
-          <span className="relative z-10">Login</span>
-        </Button>
-      </div>
+      >
+        <span className="relative z-10">Login</span>
+      </Button>
+    </div>
 
-      {/* 🚀 Get Started → always visible */}
+    {/* 🚀 Get Started → visible on sm and above */}
     <Button
       onClick={handleSignup}
-      className="relative px-6 py-2.5 rounded-lg font-semibold text-black 
+      className="hidden sm:block relative px-3 sm:px-6 py-1.5 sm:py-2.5 rounded-lg font-semibold text-black text-[11px] sm:text-sm
                  bg-linear-to-r from-yellow-500 to-yellow-400 
                  border border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.5)] 
                  hover:shadow-[0_0_30px_rgba(234,179,8,0.8)] 

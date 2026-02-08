@@ -87,7 +87,7 @@ export default function DiscoverSection() {
       <FeaturedHero />
 
       {/* 🛠️ Floating Command Bar (Search & Filter) */}
-      <div className="sticky top-20 z-30 mb-12">
+      <div className="sticky top-20 z-[9999] mb-12">
         <div className="mx-auto max-w-4xl bg-[#1A1A1A]/80 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-2 shadow-2xl flex flex-col md:flex-row gap-2 md:items-center">
 
           {/* Search Input */}
@@ -187,14 +187,24 @@ export default function DiscoverSection() {
               </AnimatePresence>
             </motion.div>
 
-            {visibleCount < filteredPosts.length && (
-              <div className="flex justify-center mt-16">
-                <Button
-                  onClick={handleShowMore}
-                  className="!bg-white/[0.05] !text-white !border !border-white/10 hover:!bg-white/10 !px-8 !py-3"
-                >
-                  Load More Articles
-                </Button>
+            {(visibleCount < filteredPosts.length || visibleCount > POSTS_PER_PAGE) && (
+              <div className="flex justify-center mt-16 gap-4">
+                {visibleCount < filteredPosts.length && (
+                  <Button
+                    onClick={handleShowMore}
+                    className="!bg-white/[0.05] !text-white !border !border-white/10 hover:!bg-white/10 !px-8 !py-3"
+                  >
+                    Load More Articles
+                  </Button>
+                )}
+                {visibleCount > POSTS_PER_PAGE && (
+                  <Button
+                    onClick={() => setVisibleCount(POSTS_PER_PAGE)}
+                    className="!bg-white/[0.03] !text-gray-400 !border !border-white/5 hover:!bg-white/10 hover:!text-white !px-8 !py-3"
+                  >
+                    Show Less
+                  </Button>
+                )}
               </div>
             )}
           </>

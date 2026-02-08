@@ -2,6 +2,7 @@ import React from "react";
 import { BookOpen, Video, Code, Terminal, Cpu, Database } from "lucide-react";
 import Background from "../src/components/Background";
 import { motion } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
 
 const Learn = () => {
   return (
@@ -67,16 +68,34 @@ const Learn = () => {
           />
         </div>
       </div>
+      <Toaster position="top-center" />
     </div>
   );
 };
 
 const LearnCard = ({ icon, title, desc, level, delay }) => {
+  const handleClick = () => {
+    toast("🚀 Coming Soon!", {
+      style: {
+        background: "#1A1A1A",
+        color: "#F5C542",
+        border: "1px solid rgba(245, 197, 66, 0.2)",
+        borderRadius: "12px",
+        padding: "16px",
+      },
+      iconTheme: {
+        primary: "#F5C542",
+        secondary: "#000",
+      },
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: delay }}
+      onClick={handleClick}
       className="group p-6 rounded-2xl bg-[#1A1A1A]/50 border border-white/[0.08] hover:bg-white/[0.05] hover:border-[#F5C542]/30 backdrop-blur-sm transition-all duration-300 cursor-pointer hover:-translate-y-1"
     >
       <div className="flex justify-between items-start mb-4">
@@ -84,8 +103,8 @@ const LearnCard = ({ icon, title, desc, level, delay }) => {
           {icon}
         </div>
         <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${level === "Beginner" ? "border-green-500/20 text-green-400 bg-green-500/10" :
-            level === "Intermediate" ? "border-blue-500/20 text-blue-400 bg-blue-500/10" :
-              "border-purple-500/20 text-purple-400 bg-purple-500/10"
+          level === "Intermediate" ? "border-blue-500/20 text-blue-400 bg-blue-500/10" :
+            "border-purple-500/20 text-purple-400 bg-purple-500/10"
           }`}>
           {level}
         </span>

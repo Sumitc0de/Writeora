@@ -156,3 +156,15 @@ body {
   color: rgba(245, 197, 66, 0.1);
   font-family: serif;
 }
+
+/* 🎨 Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}

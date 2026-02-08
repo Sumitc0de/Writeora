@@ -24,6 +24,8 @@ import Profile from "../pages/user/Profile";
 import Settings from "../pages/user/Settings";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import ContentEditor from "./components/contentEditor/ContentEditor";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 
 
 function AppContent() {
@@ -56,6 +58,23 @@ function AppContent() {
             element={
               <PageWrapper>
                 <Signup />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <PageWrapper>
+                <ForgotPassword />
+              </PageWrapper>
+            }
+          />
+
+          <Route
+            path="/reset-password/:resetToken"
+            element={
+              <PageWrapper>
+                <ResetPassword />
               </PageWrapper>
             }
           />

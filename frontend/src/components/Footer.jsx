@@ -27,10 +27,10 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto">
 
         {/* TOP GRID */}
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
 
           {/* BRAND + SUBSCRIBE */}
-          <div className="md:col-span-2 space-y-6">
+          <div className="sm:col-span-2 lg:col-span-2 space-y-6">
             <div>
               <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">
                 Writeora<span className="text-[#F5C542]">.ai</span>
@@ -40,15 +40,15 @@ const Footer = () => {
               </p>
             </div>
 
-            <div className="p-1 bg-white/[0.05] rounded-xl border border-white/[0.05] inline-flex w-full max-w-md">
+            <div className="p-1 bg-white/[0.05] rounded-xl border border-white/[0.05] flex flex-col sm:flex-row w-full max-w-md gap-2 sm:gap-0">
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 bg-transparent border-none text-sm px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-0"
+                className="flex-1 bg-transparent border-none text-sm px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-0 w-full"
               />
               <button
                 type="button"
-                className="px-6 py-2.5 bg-[#F5C542] text-black text-sm font-semibold rounded-lg hover:bg-[#ffda6b] transition-colors"
+                className="px-6 py-2.5 bg-[#F5C542] text-black text-sm font-semibold rounded-lg hover:bg-[#ffda6b] transition-colors w-full sm:w-auto"
               >
                 Subscribe
               </button>

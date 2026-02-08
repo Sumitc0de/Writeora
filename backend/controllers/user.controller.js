@@ -1,5 +1,7 @@
 // Importing the User model from models folder
 const User = require("../models/users.model");
+const crypto = require("crypto");
+
 
 // Importing utility function from utils folder
 const createTokenCookie = require("../utils/generateToken");
@@ -343,6 +345,84 @@ const getPublicProfile = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "No user found with that email" });
+    }
+
+    // Create reset token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+
+    // Hash token and set to resetPasswordToken field
+    user.resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
+
+    // Set expire
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 mins
+
+    await user.save({ validateBeforeSave: false });
+
+    // Mock Email Send
+    const resetUrl = `${req.protocol}://${req.get('host') === 'localhost:8000' ? 'localhost:5173' : req.get('host')}/reset-password/${resetToken}`;
+
+    console.log("------------------------------------------");
+    console.log("🔑 PASSWORD RESET LINK (MOCK EMAIL) 🔑");
+    console.log(`To: ${email}`);
+    console.log(`Link: ${resetUrl}`);
+    console.log("------------------------------------------");
+
+    res.status(200).json({
+      success: true,
+      message: "Reset token sent to email (Mocked: Check console)"
+    });
+
+  } catch (error) {
+    console.error("forgotPassword error:", error);
+    res.status(500).json({ message: "Email could not be sent", error: error.message });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    // Get hashed token
+    const resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(req.params.resetToken)
+      .digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired reset token" });
+    }
+
+    // Set new password
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful"
+    });
+
+  } catch (error) {
+    console.error("resetPassword error:", error);
+    res.status(500).json({ message: "Failed to reset password", error: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -354,5 +434,7 @@ module.exports = {
   updateAvatar,
   deleteProfile,
   getUserSettings,
-  getPublicProfile
+  getPublicProfile,
+  forgotPassword,
+  resetPassword
 };

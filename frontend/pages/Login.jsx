@@ -27,7 +27,6 @@ const Login = () => {
 
     try {
       await login(formData.email, formData.password);
-      navigate("/discover", { replace: true });
     } catch (err) {
       setFormError(err.response?.data?.message || "Login failed");
     } finally {
@@ -115,9 +114,9 @@ const Login = () => {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-300">
                   Password
                 </label>
-                <a href="#" className="text-xs text-[#F5C542] hover:text-yellow-300 transition-colors">
+                <Link to="/forgot-password" size="sm" className="text-xs text-[#F5C542] hover:text-yellow-300 transition-colors">
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <div className="group relative">
                 <div className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-[#F5C542] transition-colors">

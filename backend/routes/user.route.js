@@ -10,16 +10,20 @@ const {
   updateAvatar,
   deleteProfile,
   getUserSettings,
-  getPublicProfile
+  getPublicProfile,
+  forgotPassword,
+  resetPassword
 } = require("../controllers/user.controller");
 const protect = require("../middlewares/authmiddleware");
 
 const router = express.Router();
 
-// Public routes
+// Auth Routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:resetToken", resetPassword);
 
 // Profile Fetching
 router.get("/profile", protect, (req, res) => {

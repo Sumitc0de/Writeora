@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import { useAuth } from "./AuthContext";
-import { getAllPosts, createPost } from "../service/postService";
+import { getAllPosts, createPost, updatePost, getPostBySlug } from "../service/postService";
 
 export const PostContext = createContext();
 
@@ -109,6 +109,61 @@ export const PostProvider = ({ children }) => {
     [user, fetchPosts]
   );
 
+  // ✅ Update Existing Post
+  const updateExistingPost = useCallback(
+    async (postId, postPayload) => {
+      if (!user) {
+        const authError = new Error("User not authenticated");
+        setError(authError.message);
+        throw authError;
+      }
+
+      try {
+        setPublishing(true);
+        setError(null);
+
+        await updatePost(postId, postPayload);
+        await fetchPosts();
+
+        // Reset form
+        setPostData({
+          headerImage: { public_id: "", url: "" },
+          title: "",
+          subtitle: "",
+          category: "",
+          content: "",
+          hashtags: [],
+          readingTime: 1,
+        });
+      } catch (err) {
+        setError(err?.response?.data?.message || "Failed to update post");
+        throw err;
+      } finally {
+        setPublishing(false);
+      }
+    },
+    [user, fetchPosts]
+  );
+
+  // ✅ Fetch single post for editing
+  const editPost = useCallback(async (slug) => {
+    try {
+      setLoading(true);
+      const data = await getPostBySlug(slug);
+      if (data.success) {
+        setPostData({
+          ...data.post,
+          _id: data.post._id, // Ensure ID is preserved for update
+        });
+      }
+      return data;
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to load post for editing");
+    } finally {
+      setLoading(false);
+    }
+  }, [setPostData]);
+
   // ✅ Fetch only when auth state is ready
   useEffect(() => {
     if (user !== undefined) {
@@ -124,6 +179,8 @@ export const PostProvider = ({ children }) => {
       setPostData,
       fetchPosts,
       publishPost,
+      updateExistingPost,
+      editPost,
       loading,
       publishing,
       error,
@@ -133,6 +190,8 @@ export const PostProvider = ({ children }) => {
       postData,
       fetchPosts,
       publishPost,
+      updateExistingPost,
+      editPost,
       loading,
       publishing,
       error,

@@ -1,12 +1,4 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
-
-// ✅ Global axios config
-const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true, // send cookies automatically
-});
+import api from "../api/axios";
 
 // ✅ Get all posts
 export const getAllPosts = async () => {
@@ -26,8 +18,28 @@ export const getPostBySlug = async (slug) => {
   return data;
 }
 
-export const getPostByCategory = async (category)=>{
+export const getPostByCategory = async (category) => {
   const { data } = await api.get(`/posts/category/${encodeURIComponent(category)}`);
   return data;
 }
+
+export const updatePost = async (id, postData) => {
+  const { data } = await api.patch(`/posts/${id}`, postData);
+  return data;
+};
+
+export const deletePost = async (id) => {
+  const { data } = await api.delete(`/posts/${id}`);
+  return data;
+};
+
+export const updateVisibility = async (id) => {
+  const { data } = await api.patch(`/posts/${id}/visibility`);
+  return data;
+};
+
+export const getMyPosts = async () => {
+  const { data } = await api.get("/posts/user/my-posts");
+  return data;
+};
 

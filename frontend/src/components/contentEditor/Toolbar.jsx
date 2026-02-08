@@ -48,29 +48,38 @@ export default function Toolbar({ editorRef }) {
   };
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="flex items-center gap-1 px-2 py-1.5 bg-[#1A1A1A]/90 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl">
+    <div className="flex items-center justify-center w-full px-4">
+      <div className="flex flex-wrap items-center justify-center gap-1 p-1.5 bg-[#1A1A1A]/90 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-full shadow-2xl max-w-full">
 
-        <ToolButton onClick={() => applyFormat("formatBlock", "H1")} icon={<Heading1 size={18} />} tooltip="Heading 1" />
-        <ToolButton onClick={() => applyFormat("formatBlock", "H2")} icon={<Heading2 size={18} />} tooltip="Heading 2" />
+        <div className="flex items-center gap-1">
+          <ToolButton onClick={() => applyFormat("formatBlock", "H1")} icon={<Heading1 size={18} />} tooltip="Heading 1" />
+          <ToolButton onClick={() => applyFormat("formatBlock", "H2")} icon={<Heading2 size={18} />} tooltip="Heading 2" />
+        </div>
 
-        <div className="w-px h-5 bg-white/10 mx-1" />
+        <div className="w-px h-5 bg-white/10 mx-1 hidden xs:block" />
 
-        <ToolButton onClick={() => applyFormat("bold")} icon={<Bold size={18} />} tooltip="Bold" />
-        <ToolButton onClick={() => applyFormat("italic")} icon={<Italic size={18} />} tooltip="Italic" />
-        <ToolButton onClick={() => applyFormat("underline")} icon={<Underline size={18} />} tooltip="Underline" />
-        <ToolButton onClick={addLink} icon={<LinkIcon size={18} />} tooltip="Link" />
+        <div className="flex items-center gap-1">
+          <ToolButton onClick={() => applyFormat("bold")} icon={<Bold size={18} />} tooltip="Bold" />
+          <ToolButton onClick={() => applyFormat("italic")} icon={<Italic size={18} />} tooltip="Italic" />
+          <ToolButton onClick={() => applyFormat("underline")} icon={<Underline size={18} />} tooltip="Underline" />
+          <ToolButton onClick={addLink} icon={<LinkIcon size={18} />} tooltip="Link" />
+        </div>
 
-        <div className="w-px h-5 bg-white/10 mx-1" />
+        <div className="w-px h-5 bg-white/10 mx-1 hidden sm:block" />
 
-        <ToolButton onClick={() => applyFormat("insertUnorderedList")} icon={<List size={18} />} tooltip="Bullet List" />
-        <ToolButton onClick={() => applyFormat("insertOrderedList")} icon={<ListOrdered size={18} />} tooltip="Numbered List" />
-        <ToolButton onClick={() => applyFormat("formatBlock", "blockquote")} icon={<Quote size={18} />} tooltip="Quote" />
-        <ToolButton onClick={() => applyFormat("formatBlock", "pre")} icon={<Code size={18} />} tooltip="Code Block" />
+        <div className="flex items-center gap-1">
+          <ToolButton onClick={() => applyFormat("insertUnorderedList")} icon={<List size={18} />} tooltip="Bullet List" />
+          <ToolButton onClick={() => applyFormat("insertOrderedList")} icon={<ListOrdered size={18} />} tooltip="Numbered List" />
+          <ToolButton onClick={() => applyFormat("formatBlock", "blockquote")} icon={<Quote size={18} />} tooltip="Quote" />
+          <ToolButton onClick={() => applyFormat("formatBlock", "pre")} icon={<Code size={18} />} tooltip="Code Block" />
+        </div>
 
-        <div className="w-px h-5 bg-white/10 mx-1" />
-        <ToolButton onClick={() => applyFormat("formatBlock", "P")} icon={<Type size={18} />} tooltip="Normal Text" />
-        <ToolButton onClick={() => applyFormat("removeFormat")} icon={<Eraser size={18} />} tooltip="Clear Formatting" />
+        <div className="w-px h-5 bg-white/10 mx-1 hidden md:block" />
+
+        <div className="flex items-center gap-1">
+          <ToolButton onClick={() => applyFormat("formatBlock", "P")} icon={<Type size={18} />} tooltip="Normal Text" />
+          <ToolButton onClick={() => applyFormat("removeFormat")} icon={<Eraser size={18} />} tooltip="Clear Formatting" />
+        </div>
 
       </div>
     </div>

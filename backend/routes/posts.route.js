@@ -4,7 +4,10 @@ const {
   createPost,
   getAllPosts,
   getPostBySlug,
-  getPostByCategory
+  getPostByCategory,
+  updatePost,
+  deletePost,
+  toggleVisibility
 } = require("../controllers/post.controller");
 
 const {
@@ -15,7 +18,8 @@ const {
   toggleSaveBySlug,
   getSaveStatusBySlug,
   getUserSavedPosts,
-  getUserStats
+  getUserStats,
+  getMyPosts
 } = require("../controllers/postEngagement.controller")
 const protect = require("../middlewares/authmiddleware")
 
@@ -25,6 +29,7 @@ router.get("/:slug", getPostBySlug);
 
 // ✅ Protected
 router.post("/", protect, createPost);
+router.get("/user/my-posts", protect, getMyPosts);
 router.get("/category/:category", protect, getPostByCategory);
 
 router.get("/user/saved", protect, getUserSavedPosts);
@@ -40,14 +45,9 @@ router.get("/:slug/comments", protect, getCommentBySlug);
 router.post("/:slug/save", protect, toggleSaveBySlug);
 router.get("/:slug/save", protect, getSaveStatusBySlug);
 
-
-// routes/post.routes.js
-// router.delete("/:id", protect, deletePost);
-
-// router.post("/like/:id", protect, toggleLike);
-
-// // ✅ Comments
-// router.post("/comment/:id", protect, addComment);
-// router.delete("/:postId/comment/:commentId", protect, deleteComment);
+// ✅ Post Management (Owner Only)
+router.patch("/:id", protect, updatePost);
+router.delete("/:id", protect, deletePost);
+router.patch("/:id/visibility", protect, toggleVisibility);
 
 module.exports = router;

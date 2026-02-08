@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { UserCheck, MapPin, Link as LinkIcon, Calendar, Loader, Sparkles, LayoutGrid, BookmarkCheck, Heart, Eye, FileText, ArrowRight } from 'lucide-react';
+import { UserCheck, MapPin, Link as LinkIcon, Calendar, Loader, Sparkles, LayoutGrid, BookmarkCheck, Heart, Eye, EyeOff, FileText, ArrowRight } from 'lucide-react';
 import Background from "../../src/components/Background";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../src/context/AuthContext";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import { getUserSavedPosts, getUserStats, getUserStatsById } from "../../src/service/postEngagement";
-import { getAllPosts } from "../../src/service/postService";
+import { getAllPosts, getMyPosts } from "../../src/service/postService";
 import { getPublicProfile } from "../../src/service/userService";
 import ContentCard from "../../src/components/ContentCard";
 
@@ -37,17 +37,25 @@ const Profile = () => {
         ? getUserStats()
         : getUserStatsById(userId);
 
-      const [profileRes, allPostsRes, statsRes, savedRes] = await Promise.all([
+      const fetchPostsData = isOwnProfile
+        ? getMyPosts()
+        : getAllPosts();
+
+      const [profileRes, postsRes, statsRes, savedRes] = await Promise.all([
         fetchProfile,
-        getAllPosts(),
+        fetchPostsData,
         fetchStats,
         isOwnProfile ? getUserSavedPosts() : Promise.resolve({ data: { posts: [] } })
       ]);
 
       setProfileUser(profileRes.user);
 
-      // Filter posts by the target user ID
-      const targetPosts = (allPostsRes.posts || allPostsRes).filter(p => p.author?._id === targetUserId);
+      // Filter posts by the target user ID if it's not own profile
+      // (getMyPosts already returns only own posts, getAllPosts returns all public posts)
+      const allFetchedPosts = postsRes.posts || postsRes;
+      const targetPosts = isOwnProfile
+        ? allFetchedPosts
+        : allFetchedPosts.filter(p => (p.author?._id || p.author) === targetUserId);
 
       setPosts(targetPosts);
       setSavedPosts(savedRes.data?.posts || []);
@@ -63,7 +71,19 @@ const Profile = () => {
     if (currentUser?._id || userId) fetchData();
   }, [userId, currentUser?._id, fetchData]);
 
-  const displayedPosts = activeTab === 'My Posts' ? posts : savedPosts;
+  const tabs = isOwnProfile
+    ? [
+      { id: 'My Posts', icon: LayoutGrid },
+      { id: 'Private Posts', icon: EyeOff },
+      { id: 'Saved Posts', icon: BookmarkCheck }
+    ]
+    : [{ id: 'My Posts', icon: LayoutGrid }];
+
+  const displayedPosts = activeTab === 'My Posts'
+    ? posts.filter(p => p.visibility === 'public')
+    : activeTab === 'Private Posts'
+      ? posts.filter(p => p.visibility === 'private')
+      : savedPosts;
 
   if (loading) {
     return (
@@ -75,57 +95,55 @@ const Profile = () => {
       </div>
     );
   }
-
-  const tabs = isOwnProfile
-    ? [{ id: 'My Posts', icon: LayoutGrid }, { id: 'Saved Posts', icon: BookmarkCheck }]
-    : [{ id: 'My Posts', icon: LayoutGrid }];
-
   return (
     <div className="min-h-screen bg-[#050505] text-white pt-24 pb-32 relative selection:bg-[#F5C542] selection:text-black">
       <Background />
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         {/* ✨ Profile Header & Banner */}
-        <div className="relative mb-12">
-          <div className="h-64 rounded-[2rem] bg-gradient-to-br from-[#1A1A1A] via-[#0D0D0D] to-[#1A1A1A] border border-white/5 overflow-hidden shadow-2xl relative">
+        <div className="relative mt-18 sm:mt-0 mb-20 md:mb-12">
+          <div className="h-48 md:h-64 rounded-3xl md:rounded-[2rem] bg-gradient-to-br from-[#1A1A1A] via-[#0D0D0D] to-[#1A1A1A] border border-white/5 overflow-hidden shadow-2xl relative">
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#050505]/80 to-transparent" />
           </div>
 
-          <div className="absolute -bottom-8 left-10 flex flex-col md:flex-row items-end gap-6 w-[calc(100%-80px)]">
+          <div className="absolute -bottom-16 md:-bottom-8 left-0 md:left-10 flex flex-col md:flex-row items-center md:items-end gap-4 md:gap-6 w-full md:w-[calc(100%-80px)] px-6 md:px-0">
             <div className="relative group">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl border-4 border-[#050505] bg-[#1A1A1A] overflow-hidden shadow-2xl relative">
+              <div className="w-28 h-28 md:w-40 md:h-40 rounded-3xl border-4 border-[#050505] bg-[#1A1A1A] overflow-hidden shadow-2xl relative">
                 <img
                   src={profileUser?.avatar?.url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileUser?.name}`}
                   alt="Avatar"
                   className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
                 />
               </div>
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-[#F5C542] rounded-xl flex items-center justify-center border-4 border-[#050505] shadow-lg">
-                <Sparkles size={14} fill="black" />
+              <div className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 w-7 h-7 md:w-8 md:h-8 bg-[#F5C542] rounded-lg md:rounded-xl flex items-center justify-center border-4 border-[#050505] shadow-lg">
+                <Sparkles size={12} className="md:w-[14px] md:h-[14px]" fill="black" />
               </div>
             </div>
 
-            <div className="flex-1 pb-4">
-              <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex-1 text-center md:text-left pb-0 md:pb-4 w-full">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-black text-white mb-2 flex items-center gap-3">
+                  <h1 className="text-2xl md:text-4xl font-black text-white mb-1 md:mb-2 flex items-center justify-center md:justify-start gap-3">
                     {profileUser?.name}
-                    <UserCheck className="text-[#F5C542]" size={24} />
+                    <UserCheck className="text-[#F5C542] hidden sm:block" size={20} />
                   </h1>
-                  <p className="text-[#F5C542] font-black uppercase tracking-[0.2em] text-xs opacity-80 mb-4">
+                  <p className="text-[#F5C542] font-black uppercase tracking-[0.2em] text-[10px] md:text-xs opacity-80 mb-3 md:mb-4">
                     {profileUser?.role || "Verified Creator"}
                   </p>
                 </div>
                 {isOwnProfile && (
-                  <div className="flex items-center gap-3">
-                    <button onClick={() => navigate('/settings')} className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 hover:border-[#F5C542]/30 transition-all">
+                  <div className="flex items-center gap-3 w-full md:w-auto">
+                    <button
+                      onClick={() => navigate('/settings')}
+                      className="w-full md:w-auto px-6 py-2 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 hover:border-[#F5C542]/30 transition-all shadow-lg"
+                    >
                       Edit Profile
                     </button>
                   </div>
                 )}
               </div>
 
-              <p className="text-gray-400  leading-relaxed max-w-xl  text-sm italic">
+              <p className="text-gray-400 leading-relaxed max-w-xl text-xs md:text-sm italic mx-auto md:mx-0">
                 "{profileUser?.bio || "Crafting digital stories and exploring the boundaries of creativity."}"
               </p>
             </div>
@@ -133,7 +151,7 @@ const Profile = () => {
         </div>
 
         {/* 📊 Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 mt-20 md:mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12 md:mb-16 mt-20 md:mt-12">
           {[
             { label: isOwnProfile ? 'Published Stories' : 'Stories Published', value: stats.totalPosts || 0, icon: FileText, color: 'text-blue-400' },
             { label: 'Reader Appreciation', value: stats.totalLikes || 0, icon: Heart, color: 'text-red-400' },
@@ -160,16 +178,16 @@ const Profile = () => {
         </div>
 
         {/* 📚 Navigation & Filtering */}
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 pb-4 border-b border-white/5">
-          <div className="flex items-center gap-8 px-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-0 border-b border-white/5 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-6 md:gap-8 px-2 min-w-max">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === tab.id ? "text-[#F5C542]" : "text-gray-500 hover:text-white"
+                className={`flex items-center gap-2 pb-4 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === tab.id ? "text-[#F5C542]" : "text-gray-500 hover:text-white"
                   }`}
               >
-                <tab.icon size={14} />
+                <tab.icon size={12} className="md:w-[14px] md:h-[14px]" />
                 {tab.id}
                 {activeTab === tab.id && (
                   <motion.div layoutId="profileTab" className="absolute bottom-[-1px] left-0 w-full h-0.5 bg-[#F5C542]" />
@@ -190,7 +208,12 @@ const Profile = () => {
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
               {displayedPosts.map((post, idx) => (
-                <ContentCard key={post._id} {...post} idx={idx} />
+                <ContentCard
+                  key={post._id}
+                  {...post}
+                  idx={idx}
+                  onActionComplete={fetchData}
+                />
               ))}
             </motion.div>
           ) : (
@@ -205,8 +228,10 @@ const Profile = () => {
               <h3 className="text-xl font-black text-gray-300 mb-2">Workspace Empty</h3>
               <p className="text-gray-500 max-w-xs mb-8">
                 {activeTab === 'My Posts'
-                  ? (isOwnProfile ? "You haven't published any insights yet." : `${profileUser?.name} hasn't published any stories yet.`)
-                  : "You haven't bookmarked any articles yet."}
+                  ? (isOwnProfile ? "You haven't published any public stories yet." : `${profileUser?.name} hasn't published any stories yet.`)
+                  : activeTab === 'Private Posts'
+                    ? "Your private workspace is clean. Only you can see what's here."
+                    : "You haven't bookmarked any articles yet."}
               </p>
               {isOwnProfile && (
                 activeTab === 'My Posts' ? (

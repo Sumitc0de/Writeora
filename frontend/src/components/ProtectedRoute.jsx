@@ -4,17 +4,18 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
-  const { user, isLoggedIn, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   // ⏳ While loading auth, show nothing but allow transitions to settle
   if (loading) {
-    return <div className="min-h-screen bg-[#0F0D0A]" />; 
+    return <div className="min-h-screen bg-[#0F0D0A]" />;
   }
 
   // 🔐 Allow when logged in
-  if (user || isLoggedIn()) {
+  if (user) {
     return children;
   }
+
 
   // 🚫 Redirect user to login (with replace)
   return <Navigate to="/login" replace />;

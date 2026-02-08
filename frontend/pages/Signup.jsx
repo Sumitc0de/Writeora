@@ -37,7 +37,6 @@ const Signup = () => {
     setIsLoading(true);
     try {
       await signup(formData.name, formData.email, formData.password);
-      navigate("/discover", { replace: true });
     } catch (err) {
       setFormError(err.response?.data?.message || "Signup failed");
     } finally {

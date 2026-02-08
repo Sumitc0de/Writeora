@@ -8,10 +8,11 @@ const ConditionalRoute = ({ children }) => {
 
   if (loading) return null; // ⏳ Wait for auth check
 
-  // ✅ If token exists or user already loaded
-  if (isLoggedIn() || user) {
+  // ✅ If user already loaded
+  if (user) {
     return <Navigate to="/discover" replace />;
   }
+
 
   // ❌ If not logged in
   return children;
