@@ -25,7 +25,6 @@ const protect = require("../middlewares/authmiddleware")
 
 // ✅ Public
 router.get("/", getAllPosts);
-router.get("/:slug", getPostBySlug);
 
 // ✅ Protected
 router.post("/", protect, createPost);
@@ -49,5 +48,8 @@ router.get("/:slug/save", protect, getSaveStatusBySlug);
 router.patch("/:id", protect, updatePost);
 router.delete("/:id", protect, deletePost);
 router.patch("/:id/visibility", protect, toggleVisibility);
+
+// ✅ Public
+router.get("/:slug", getPostBySlug);
 
 module.exports = router;
