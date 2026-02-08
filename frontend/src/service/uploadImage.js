@@ -1,3 +1,5 @@
+import { api } from "./api";
+
 export const uploadImage = async (file) => {
   try {
     if (!file) throw new Error("No file provided");
@@ -11,13 +13,11 @@ export const uploadImage = async (file) => {
 
     console.log("📤 Uploading image...");
 
-    const res = await fetch("http://localhost:8000/api/upload", {
-      method: "POST",
-      body: formData,
-      credentials: "include",
+    const { data } = await api.post("/api/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
-
-    const data = await res.json();
 
     if (!data.success) {
       throw new Error(data.message || "Upload failed");
@@ -25,14 +25,16 @@ export const uploadImage = async (file) => {
 
     console.log("✅ Upload response:", data);
 
-    // RETURN EXACT STRUCTURE FOR POST SCHEMA
     return {
       public_id: data.public_id,
       url: data.imageUrl,
     };
 
   } catch (err) {
-    console.error("❌ Image upload error:", err);
+    console.error(
+      "❌ Image upload error:",
+      err.response?.data?.message || err.message
+    );
     throw err;
   }
 };

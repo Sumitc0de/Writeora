@@ -1,6 +1,4 @@
-import api from "../api/axios";
-
-
+import { api } from "../service/api.js";
 // Toggle save
 export const toggleSavePost = (slug) =>
   api.post(`/posts/${slug}/save`);

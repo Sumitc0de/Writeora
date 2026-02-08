@@ -1,24 +1,17 @@
-const API_BASE = "http://localhost:8000/api/user";
+import { api } from "./api";
+
+/* ---------------- USER SETTINGS ---------------- */
 
 // Update username
 export const updateUsername = async (username) => {
     try {
-        const res = await fetch(`${API_BASE}/settings/username`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ username }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            throw new Error(data.message || "Failed to update username");
-        }
-
+        const { data } = await api.put("/api/user/settings/username", { username });
         return data;
     } catch (error) {
-        console.error("updateUsername error:", error);
+        console.error(
+            "updateUsername error:",
+            error.response?.data?.message || error.message
+        );
         throw error;
     }
 };
@@ -26,22 +19,13 @@ export const updateUsername = async (username) => {
 // Update bio
 export const updateBio = async (bio) => {
     try {
-        const res = await fetch(`${API_BASE}/settings/bio`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ bio }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            throw new Error(data.message || "Failed to update bio");
-        }
-
+        const { data } = await api.put("/api/user/settings/bio", { bio });
         return data;
     } catch (error) {
-        console.error("updateBio error:", error);
+        console.error(
+            "updateBio error:",
+            error.response?.data?.message || error.message
+        );
         throw error;
     }
 };
@@ -49,22 +33,13 @@ export const updateBio = async (bio) => {
 // Update avatar
 export const updateAvatar = async (avatar) => {
     try {
-        const res = await fetch(`${API_BASE}/settings/avatar`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ avatar }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            throw new Error(data.message || "Failed to update avatar");
-        }
-
+        const { data } = await api.put("/api/user/settings/avatar", { avatar });
         return data;
     } catch (error) {
-        console.error("updateAvatar error:", error);
+        console.error(
+            "updateAvatar error:",
+            error.response?.data?.message || error.message
+        );
         throw error;
     }
 };
@@ -72,22 +47,16 @@ export const updateAvatar = async (avatar) => {
 // Change password
 export const changePassword = async (currentPassword, newPassword) => {
     try {
-        const res = await fetch(`${API_BASE}/settings/password`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ currentPassword, newPassword }),
+        const { data } = await api.put("/api/user/settings/password", {
+            currentPassword,
+            newPassword,
         });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            throw new Error(data.message || "Failed to change password");
-        }
-
         return data;
     } catch (error) {
-        console.error("changePassword error:", error);
+        console.error(
+            "changePassword error:",
+            error.response?.data?.message || error.message
+        );
         throw error;
     }
 };
@@ -95,22 +64,15 @@ export const changePassword = async (currentPassword, newPassword) => {
 // Delete account
 export const deleteAccount = async (password) => {
     try {
-        const res = await fetch(`${API_BASE}/settings/account`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ password }),
+        const { data } = await api.delete("/api/user/settings/account", {
+            data: { password }, // axios delete body
         });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            throw new Error(data.message || "Failed to delete account");
-        }
-
         return data;
     } catch (error) {
-        console.error("deleteAccount error:", error);
+        console.error(
+            "deleteAccount error:",
+            error.response?.data?.message || error.message
+        );
         throw error;
     }
 };
@@ -118,40 +80,27 @@ export const deleteAccount = async (password) => {
 // Get user settings
 export const getUserSettings = async () => {
     try {
-        const res = await fetch(`${API_BASE}/settings`, {
-            method: "GET",
-            credentials: "include",
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            throw new Error(data.message || "Failed to fetch settings");
-        }
-
+        const { data } = await api.get("/api/user/settings");
         return data;
     } catch (error) {
-        console.error("getUserSettings error:", error);
+        console.error(
+            "getUserSettings error:",
+            error.response?.data?.message || error.message
+        );
         throw error;
     }
 };
-// Get Public Profile
+
+// Get public profile
 export const getPublicProfile = async (id) => {
     try {
-        const res = await fetch(`${API_BASE}/author/${id}`, {
-            method: "GET",
-            credentials: "include",
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            throw new Error(data.message || "Failed to fetch profile");
-        }
-
+        const { data } = await api.get(`/api/user/author/${id}`);
         return data;
     } catch (error) {
-        console.error("getPublicProfile error:", error);
+        console.error(
+            "getPublicProfile error:",
+            error.response?.data?.message || error.message
+        );
         throw error;
     }
 };

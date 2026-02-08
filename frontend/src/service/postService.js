@@ -1,4 +1,4 @@
-import api from "../api/axios";
+import { api } from "../service/api.js";
 
 // ✅ Get all posts
 export const getAllPosts = async () => {

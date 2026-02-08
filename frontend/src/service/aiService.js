@@ -1,13 +1,4 @@
-import axios from "axios";
-
-const API_URL ="http://localhost:8000/api/ai";
-
-const api = axios.create({
-  baseURL: API_URL,
-  headers: { "Content-Type": "application/json" },
-  withCredentials: true,
-});
-
+import { api } from "../service/api.js";
 const handleRequest = async (req) => {
   try {
     const res = await req;
