@@ -33,7 +33,7 @@ const Footer = () => {
           <div className="sm:col-span-2 lg:col-span-2 space-y-6">
             <div>
               <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">
-                Writeora<span className="text-[#F5C542]">.ai</span>
+                Writeora
               </h3>
               <p className="text-gray-400 text-sm max-w-sm leading-relaxed">
                 The intelligent platform for modern creators. Write, learn, and grow with AI-powered tools designed for the future.

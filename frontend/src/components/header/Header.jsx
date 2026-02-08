@@ -58,7 +58,7 @@ function Header() {
         <div className="w-8 h-8 rounded-lg bg-[#F5C542] flex items-center justify-center text-black shadow-[0_0_15px_rgba(245,197,66,0.5)] group-hover:scale-105 transition-transform">
           <Sparkles size={18} fill="black" />
         </div>
-        <span>Writeora<span className="text-[#F5C542]">.ai</span></span>
+        <span>Writeora</span>
       </div>
 
       {/* DESKTOP NAV */}
