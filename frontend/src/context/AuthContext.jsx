@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import API from "../api/axios";
+import { api } from "../service/api";
 
 export const AuthContext = createContext();
 
@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
    */
   const fetchUser = async () => {
     try {
-      const { data } = await API.get("/user/profile");
+      const { data } = await api.get("/api/user/profile");
       setUser(data.user); // ✅ Backend sends the user inside data.user
       setError(null);
     } catch (err) {
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const { data } = await API.post("/user/login", { email, password });
+      const { data } = await api.post("/api/user/login", { email, password });
       setUser(data.user);
       setError(null);
       return data;
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await API.post("/user/logout");
+      await api.post("/api/user/logout");
       setUser(null);
       Cookies.remove("token"); // ✅ Ensure token cookie is cleared manually (for safety)
       window.location.href = "/"; // ✅ Hard redirect fallback
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
   // 📝 Signup Handler
   const signup = async (name, email, password) => {
     try {
-      const { data } = await API.post("/user/register", { name, email, password });
+      const { data } = await api.post("/api/user/register", { name, email, password });
       setUser(data.user);
       setError(null);
       return data;
@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }) => {
   // 🔐 Password Change Handler
   const updatePassword = async (currentPassword, newPassword) => {
     try {
-      const { data } = await API.put("/user/settings/password", { currentPassword, newPassword });
+      const { data } = await api.put("/api/user/settings/password", { currentPassword, newPassword });
       setError(null);
       return data;
     } catch (err) {
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
   // 🗑️ Account Deletion Handler
   const deleteAccount = async (password) => {
     try {
-      const { data } = await API.delete("/user/settings/account", { data: { password } });
+      const { data } = await api.delete("/api/user/settings/account", { data: { password } });
       setUser(null);
       Cookies.remove("token");
       setError(null);
@@ -125,6 +125,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom Auth Hook
+// Custom Auth Hook 
 export const useAuth = () => useContext(AuthContext);
 

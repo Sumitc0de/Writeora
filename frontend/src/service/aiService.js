@@ -9,16 +9,16 @@ const handleRequest = async (req) => {
 };
 
 export const expandContent = (content) =>
-  handleRequest(api.post("/expand", { content }));
+  handleRequest(api.post("/api/ai/expand", { content }));
 
 export const shortenContent = (content) =>
-  handleRequest(api.post("/shorten", { content }));
+  handleRequest(api.post("/api/ai/shorten", { content }));
 
 export const checkSEO = (content) =>
-  handleRequest(api.post("/seo-check", { content }));
+  handleRequest(api.post("/api/ai/seo-check", { content }));
 
 export const fixGrammar = (content) =>
-  handleRequest(api.post("/fix-grammar", { content }));
+  handleRequest(api.post("/api/ai/fix-grammar", { content }));
 
 export const generateContent = (prompt, template = "blog") =>
-  handleRequest(api.post("/generate", { prompt, template }));
+  handleRequest(api.post("/api/ai/generate", { prompt, template }));
