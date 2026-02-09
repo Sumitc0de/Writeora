@@ -91,6 +91,22 @@ const getPostBySlug = async (req, res) => {
       }
     }
 
+    // Increment Views Logic
+    if (req.user) {
+      // If user is logged in, check if they have already viewed
+      const alreadyViewed = post.viewedBy.includes(req.user._id);
+
+      if (!alreadyViewed) {
+        post.viewedBy.push(req.user._id);
+        post.views = (post.views || 0) + 1;
+        await post.save();
+      }
+    } else {
+      // If guest, just increment (or we could use IP tracking but simple increment for guests is standard behavior here)
+      post.views = (post.views || 0) + 1;
+      await post.save();
+    }
+
     return res.status(200).json({ success: true, post });
   } catch (error) {
     console.error("❌ Get Post By Slug Error:", error);

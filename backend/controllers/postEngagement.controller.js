@@ -245,12 +245,19 @@ const getUserStats = async (req, res) => {
     // Total Views across all posts
     const totalViews = userPosts.reduce((sum, post) => sum + (post.views || 0), 0);
 
+    // Total Word Count across all posts
+    const totalWordCount = userPosts.reduce((sum, post) => {
+      const wordCount = post.content ? post.content.trim().split(/\s+/).length : 0;
+      return sum + wordCount;
+    }, 0);
+
     return res.status(200).json({
       success: true,
       stats: {
         totalPosts,
         totalLikes,
         totalViews,
+        totalWordCount,
       },
     });
   } catch (error) {

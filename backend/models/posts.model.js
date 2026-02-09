@@ -22,10 +22,10 @@ const postSchema = mongoose.Schema({
         trim: true,
         maxlength: 250,
     },
-    category:{
+    category: {
         type: String,
-        required:[true, "category is required"],
-        minlength:4,
+        required: [true, "category is required"],
+        minlength: 4,
     },
     slug: {
         type: String,
@@ -114,6 +114,13 @@ const postSchema = mongoose.Schema({
         default: 0,
     },
 
+    viewedBy: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ],
+
     // bookmarksCount: {
     //     type: Number,
     //     default: 0,
@@ -147,14 +154,14 @@ postSchema.pre("save", function (next) {
 
 // Respective Author of the post
 postSchema.post("save", async function (doc) {
-  try {
-    // Find the Author id from doc and push to model
-    await User.findByIdAndUpdate(doc.author, {
-      $push: { posts: doc._id }
-    });
-  } catch (err) {
-    console.error("Error updating user's posts:", err);
-  }
+    try {
+        // Find the Author id from doc and push to model
+        await User.findByIdAndUpdate(doc.author, {
+            $push: { posts: doc._id }
+        });
+    } catch (err) {
+        console.error("Error updating user's posts:", err);
+    }
 });
 
 

@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8000/api/user";
+const API_BASE = "http://localhost:5000/api/user";
 
 // Update username
 export const updateUsername = async (username) => {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { MessageCircle, Clock, User, Bookmark, Heart, Share2, ArrowLeft, Sparkles } from "lucide-react";
+import { MessageCircle, Clock, User, Bookmark, Heart, Share2, ArrowLeft, Sparkles, Eye } from "lucide-react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getPostBySlug } from "../src/service/postService";
 import { toggleSavePost, getSaveStatus, getComments, addComment, toggleLikePost, getLikeStatus } from "../src/service/postEngagement";
@@ -253,6 +253,10 @@ const Posts = () => {
               <div className="flex items-center gap-2">
                 <Clock size={14} className="text-[#F5C542]" />
                 <span>{post.readingTime || 5} min read</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Eye size={14} className="text-[#F5C542]" />
+                <span>{post.views > 1000 ? `${(post.views / 1000).toFixed(1)}K` : (post.views || 0)} views</span>
               </div>
               <div className="flex items-center gap-2">
                 <span>{new Date(post.createdAt).toLocaleDateString()}</span>

@@ -11,7 +11,7 @@ export const uploadImage = async (file) => {
 
     console.log("📤 Uploading image...");
 
-    const res = await fetch("http://localhost:8000/api/upload", {
+    const res = await fetch("http://localhost:5000/api/upload", {
       method: "POST",
       body: formData,
       credentials: "include",

@@ -18,7 +18,7 @@ const Profile = () => {
   const [profileUser, setProfileUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [savedPosts, setSavedPosts] = useState([]);
-  const [stats, setStats] = useState({ totalPosts: 0, totalLikes: 0, totalViews: 0 });
+  const [stats, setStats] = useState({ totalPosts: 0, totalLikes: 0, totalViews: 0, totalWordCount: 0 });
   const [loading, setLoading] = useState(true);
 
   const isOwnProfile = !userId || userId === currentUser?._id;
@@ -151,11 +151,12 @@ const Profile = () => {
         </div>
 
         {/* 📊 Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12 md:mb-16 mt-20 md:mt-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 mt-20 md:mt-12">
           {[
             { label: isOwnProfile ? 'Published Stories' : 'Stories Published', value: stats.totalPosts || 0, icon: FileText, color: 'text-blue-400' },
             { label: 'Reader Appreciation', value: stats.totalLikes || 0, icon: Heart, color: 'text-red-400' },
-            { label: 'Total Engagement', value: (stats.totalViews || 0) > 1000 ? `${((stats.totalViews || 0) / 1000).toFixed(1)}K` : (stats.totalViews || 0), icon: Eye, color: 'text-[#F5C542]' }
+            { label: 'Total Engagement', value: (stats.totalViews || 0) > 1000 ? `${((stats.totalViews || 0) / 1000).toFixed(1)}K` : (stats.totalViews || 0), icon: Eye, color: 'text-[#F5C542]' },
+            { label: 'Total Word Count', value: (stats.totalWordCount || 0) > 1000 ? `${((stats.totalWordCount || 0) / 1000).toFixed(1)}K` : (stats.totalWordCount || 0), icon: FileText, color: 'text-purple-400' }
           ].map((stat, i) => (
             <motion.div
               key={stat.label}

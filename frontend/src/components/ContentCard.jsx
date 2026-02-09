@@ -15,6 +15,7 @@ const ContentCard = ({
   category,
   headerImage,
   readingTime,
+  views = 0,
   visibility = "public",
   onActionComplete,
   idx = 0 // for staggered delay
@@ -197,6 +198,9 @@ const ContentCard = ({
             </div>
             <div className="flex items-center gap-1.5">
               <Clock size={12} /> {readingTime || 5} min read
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Eye size={12} /> {views > 1000 ? `${(views / 1000).toFixed(1)}K` : views}
             </div>
           </div>
         </div>

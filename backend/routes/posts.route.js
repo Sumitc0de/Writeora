@@ -22,10 +22,11 @@ const {
   getMyPosts
 } = require("../controllers/postEngagement.controller")
 const protect = require("../middlewares/authmiddleware")
+const optionalAuth = require("../middlewares/optionalAuth")
 
 // ✅ Public
 router.get("/", getAllPosts);
-router.get("/:slug", getPostBySlug);
+router.get("/:slug", optionalAuth, getPostBySlug);
 
 // ✅ Protected
 router.post("/", protect, createPost);
