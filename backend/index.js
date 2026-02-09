@@ -23,6 +23,7 @@ app.use(
       "http://localhost:5173",
       "https://writeora-ai.vercel.app",
       "https://writeora.netlify.app",
+      "https://writeora-2w2z.onrender.com"
       ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(",") : [])
     ].filter(Boolean), // Remove undefined values
     credentials: true,
