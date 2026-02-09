@@ -19,8 +19,13 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")))
 app.use(
   cors({
-    origin: "http://localhost:5173",   // your React frontend
-    credentials: true,                 // allow cookies
+    origin: [
+      "http://localhost:5173",
+      "https://writeora-ai.vercel.app",
+      "https://writeora.netlify.app",
+      ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(",") : [])
+    ].filter(Boolean), // Remove undefined values
+    credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
