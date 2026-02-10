@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import API from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
@@ -8,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   /**
    * 🔍 Fetch the logged-in user's profile from the backend
@@ -15,7 +17,7 @@ export const AuthProvider = ({ children }) => {
    */
   const fetchUser = async () => {
     try {
-      const { data } = await API.get("/user/profile");
+      const { data } = await API.get("/api/user/profile", { withCredentials: true });
       setUser(data.user); // ✅ Backend sends the user inside data.user
       setError(null);
     } catch (err) {
@@ -38,7 +40,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const { data } = await API.post("/user/login", { email, password });
+      const { data } = await API.post("/api/user/login", { email, password });
+      await fetchUser();
       setUser(data.user);
       setError(null);
       return data;
@@ -52,22 +55,22 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await API.post("/user/logout");
+      await API.post("/api/user/logout");
       setUser(null);
-      Cookies.remove("token"); // ✅ Ensure token cookie is cleared manually (for safety)
-      window.location.href = "/"; // ✅ Hard redirect fallback
+      navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Logout failed");
       throw err;
     }
   };
 
+
   //  🔐 Sign Out logic is handled by clear credentials on backend
 
   // 📝 Signup Handler
   const signup = async (name, email, password) => {
     try {
-      const { data } = await API.post("/user/register", { name, email, password });
+      const { data } = await API.post("/api/user/register", { name, email, password });
       setUser(data.user);
       setError(null);
       return data;
@@ -80,7 +83,7 @@ export const AuthProvider = ({ children }) => {
   // 🔐 Password Change Handler
   const updatePassword = async (currentPassword, newPassword) => {
     try {
-      const { data } = await API.put("/user/settings/password", { currentPassword, newPassword });
+      const { data } = await API.put("/api/user/settings/password", { currentPassword, newPassword });
       setError(null);
       return data;
     } catch (err) {
@@ -92,11 +95,11 @@ export const AuthProvider = ({ children }) => {
   // 🗑️ Account Deletion Handler
   const deleteAccount = async (password) => {
     try {
-      const { data } = await API.delete("/user/settings/account", { data: { password } });
+      const { data } = await API.delete("/api/user/settings/account", { data: { password } });
       setUser(null);
       Cookies.remove("token");
       setError(null);
-      window.location.href = "/";
+      navigate("/");
       return data;
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete account");
@@ -120,8 +123,9 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {loading ? null : children}
     </AuthContext.Provider>
+
   );
 };
 

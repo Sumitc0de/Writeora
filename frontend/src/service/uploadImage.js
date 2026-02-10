@@ -17,6 +17,7 @@ export const uploadImage = async (file) => {
       credentials: "include",
     });
 
+
     const data = await res.json();
 
     if (!data.success) {
