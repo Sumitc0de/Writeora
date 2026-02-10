@@ -24,7 +24,7 @@ export const uploadImage = async (file) => {
       throw new Error(data.message || "Upload failed");
     }
 
-    console.log("✅ Upload response:", data);
+    // console.log("✅ Upload response:", data);
 
     // RETURN EXACT STRUCTURE FOR POST SCHEMA
     return {

@@ -1,16 +1,25 @@
 import { AnimatePresence } from "framer-motion";
-import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+
 import { AuthProvider } from "./context/AuthContext";
 import { PostProvider } from "./context/PostContext";
 
 import { Toaster } from "react-hot-toast";
 import ScrollToTop from "./components/ScrollToTop";
+import ScrollToTopButton from "./components/ScrollToTopButton";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PageWrapper from "./components/transition/PageWrapper";
 import FadeTransition from "./components/transition/FadeTransition";
 
 import Layout from "./components/layouts/Layout";
 
+// Pages
 import LandingPage from "../pages/LandingPage";
 import AboutPage from "../pages/AboutPage";
 import ContactPage from "../pages/Contactpage";
@@ -22,11 +31,11 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Profile from "../pages/user/Profile";
 import Settings from "../pages/user/Settings";
-import ScrollToTopButton from "./components/ScrollToTopButton";
-import ContentEditor from "./components/contentEditor/ContentEditor";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 
+// Editor
+import ContentEditor from "./components/contentEditor/ContentEditor";
 
 function AppContent() {
   const location = useLocation();
@@ -37,13 +46,13 @@ function AppContent() {
       <ScrollToTop />
       <ScrollToTopButton />
 
-      <AnimatePresence>
-        {/* Full screen fade transition */}
-        <FadeTransition key={"glow-" + location.pathname} />
+      <AnimatePresence mode="wait">
+        {/* Global fade effect */}
+        <FadeTransition key={`fade-${location.pathname}`} />
 
         <Routes location={location} key={location.pathname}>
 
-          {/* AUTH (no layout) */}
+          {/* ================= AUTH ROUTES (NO LAYOUT) ================= */}
           <Route
             path="/login"
             element={
@@ -61,6 +70,7 @@ function AppContent() {
               </PageWrapper>
             }
           />
+
           <Route
             path="/forgot-password"
             element={
@@ -79,10 +89,10 @@ function AppContent() {
             }
           />
 
-          {/* LAYOUT ROUTES */}
+          {/* ================= MAIN LAYOUT ROUTES ================= */}
           <Route path="/" element={<Layout />}>
 
-            {/* Public routes */}
+            {/* Public */}
             <Route
               index
               element={
@@ -110,7 +120,7 @@ function AppContent() {
               }
             />
 
-            {/* Protected */}
+            {/* ================= PROTECTED ROUTES ================= */}
             <Route
               path="discover"
               element={
@@ -177,6 +187,7 @@ function AppContent() {
               }
             />
 
+            {/* ✅ FIXED: RELATIVE NESTED ROUTE */}
             <Route
               path="create/write"
               element={
@@ -200,14 +211,13 @@ function AppContent() {
             />
           </Route>
 
-          {/* fallback */}
+          {/* ================= FALLBACK ================= */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AnimatePresence>
     </>
   );
 }
-
 
 function App() {
   return (
