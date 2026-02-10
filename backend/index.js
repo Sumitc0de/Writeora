@@ -17,20 +17,32 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")))
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://writeora-ai.vercel.app",
+  "https://writeora.netlify.app",
+  "https://writeora-2w2z.onrender.com",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://writeora-ai.vercel.app",
-      "https://writeora.netlify.app",
-      "https://writeora-2w2z.onrender.com/",
-      ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(",") : [])
-    ].filter(Boolean), // Remove undefined values
+    origin: function (origin, callback) {
+      // allow server-to-server / postman
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, origin); // 🔥 reflect exact origin
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+app.options("*", cors());
+
 
 // DB Connection
 connectDB();

@@ -93,10 +93,10 @@ const loginUser = async (req, res) => {
 const logoutUser = (req, res) => {
   try {
     // Check if the application is running in production environment
-    const isProd = process.env.NODE_ENV === "production";
+    const isProd = process.env.NODE_ENV === "production" || process.env.FRONTEND_URL;
     res.cookie("token", "", {
       httpOnly: true,
-      secure: isProd,
+      secure: !!isProd,
       sameSite: isProd ? "none" : "lax",
       expires: new Date(0),
     });
@@ -296,10 +296,10 @@ const deleteProfile = async (req, res) => {
     await User.findByIdAndDelete(userId);
 
     // Clear authentication cookie
-    const isProd = process.env.NODE_ENV === "production";
+    const isProd = process.env.NODE_ENV === "production" || process.env.FRONTEND_URL;
     res.cookie("token", "", {
       httpOnly: true,
-      secure: isProd,
+      secure: !!isProd,
       sameSite: isProd ? "none" : "lax",
       expires: new Date(0),
     });

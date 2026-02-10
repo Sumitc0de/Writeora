@@ -6,11 +6,11 @@ const createTokenCookie = (res, userId) => {
     expiresIn: "7d",
   });
 
-  const isProd = process.env.NODE_ENV === "production";
+  const isProd = process.env.NODE_ENV === "production" || process.env.FRONTEND_URL;
 
   const cookieOptions = {
     httpOnly: true,
-    secure: isProd, // send only over HTTPS in production
+    secure: !!isProd, // send only over HTTPS in production or if frontend url is set
     sameSite: isProd ? "none" : "lax", // 'none' required for cross-site cookie in prod with secure
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   };
