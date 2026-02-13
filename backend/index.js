@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, "public")))
 const allowedOrigins = [
   "http://localhost:5173",
   "https://writeora-ai.vercel.app",
-  "https://writeora.netlify.app",
+  "https://writeora-v1.vercel.app",
   "https://writeora-2w2z.onrender.com",
 ];
 
