@@ -2,8 +2,25 @@ import React from "react";
 import Background from "../src/components/Background";
 import { Sparkles, Users, Globe, Award, Rocket, Heart } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSEO } from "../src/hooks/useSEO";
 
 const AboutPage = () => {
+  useSEO({
+    title: "About Writeora - Prioritizing Human Creativity",
+    description: "Writeora is a writing platform that puts human creativity first. We provide free tools for manual writing and paid AI boosters to help you when you're stuck.",
+    keywords: "Manual writing tools, Creative writing platform, Human-centric AI, Writer community, Free blogging platform",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "Writeora",
+        "description": "A platform that champions human creativity, supported by AI intensity.",
+        "url": "https://writeora.ai"
+      }
+    }
+  });
+
   return (
     <div className="min-h-screen bg-[#050505] text-white pt-24 pb-20 px-6 lg:px-20 relative overflow-hidden">
       <Background />
@@ -20,11 +37,12 @@ const AboutPage = () => {
               Since 2024
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-              Redefining <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">Storytelling.</span>
+              Championing <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">Human Creativity.</span>
             </h1>
             <p className="text-xl text-gray-400 leading-relaxed mb-8">
-              Writeora isn't just an AI tool. It's a movement to democratize creativity,
-              giving everyone the power to articulate their ideas with clarity and impact.
+              Writeora is built for writers, not just for automated generation.
+              We believe in giving you the best tools to craft your story manually,
+              using AI only as a supportive boost when you need it.
             </p>
           </motion.div>
 
@@ -38,7 +56,9 @@ const AboutPage = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-[#F5C542]/20 to-purple-900/20 mix-blend-overlay"></div>
               <img
                 src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop"
-                alt="Team working"
+                alt="Team working on AI platform"
+                loading="lazy"
+                title="Writeora Team"
                 className="w-full h-full object-cover opacity-60 hover:scale-105 transition-transform duration-700"
               />
             </div>
@@ -61,10 +81,10 @@ const AboutPage = () => {
       {/* Stats Grid */}
       <div className="max-w-7xl mx-auto mb-32 z-10 relative">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard number="10k+" label="Community" icon={<Users />} delay={0.1} />
+          <StatCard number="10k+" label="Active Community" icon={<Users />} delay={0.1} />
           <StatCard number="5M+" label="Words Generated" icon={<Sparkles />} delay={0.2} />
-          <StatCard number="120+" label="Countries" icon={<Globe />} delay={0.3} />
-          <StatCard number="99%" label="Satisfaction" icon={<Heart />} delay={0.4} />
+          <StatCard number="120+" label="Global Reach (Countries)" icon={<Globe />} delay={0.3} />
+          <StatCard number="99%" label="User Satisfaction" icon={<Heart />} delay={0.4} />
         </div>
       </div>
 
@@ -76,16 +96,16 @@ const AboutPage = () => {
           viewport={{ once: true }}
           className="text-center"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-8">Why We Built This</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-8">Why We Built Writeora</h2>
           <div className="p-10 rounded-3xl bg-gradient-to-b from-white/[0.03] to-transparent border border-white/[0.05] backdrop-blur-sm">
             <p className="text-lg text-gray-300 leading-8 mb-6">
-              "In a world overflowig with information, clarity is power. We noticed that brilliant ideas often remained
+              "In a world overflowing with information, clarity is power. We noticed that brilliant ideas often remained
               untold simply because writing them down was a friction-filled process. We asked ourselves:
               <span className="text-white font-semibold"> What if your writing tool could think with you?</span>"
             </p>
             <p className="text-lg text-gray-300 leading-8">
               Today, Writeora serves creators ranging from students to Fortune 500 executives, helping them
-              bridge the gap between thought and expression.
+              bridge the gap between thought and expression through our AI-first platform.
             </p>
           </div>
         </motion.div>

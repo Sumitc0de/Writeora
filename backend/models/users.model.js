@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require("mongoose");
-const bcrypt =  require("bcrypt")
+const bcrypt = require("bcrypt")
 
 // creating user model for
 const userSchema = mongoose.Schema({
@@ -31,6 +31,11 @@ const userSchema = mongoose.Schema({
         enum: ["user", "admin"],
         default: "user",
     },
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user",
+    },
 
     bio: {
         type: String
@@ -39,7 +44,7 @@ const userSchema = mongoose.Schema({
         type: Number,
         default: 0,
     },
-    posts:[
+    posts: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Posts"
@@ -56,7 +61,7 @@ const userSchema = mongoose.Schema({
 // password hashing using bcrypt
 // before creating user saved hash password
 userSchema.pre("save", async function (next) {
-    if(!this.isModified("password")) return next();
+    if (!this.isModified("password")) return next();
 
     // password hashing
     this.password = await bcrypt.hash(this.password, 10);

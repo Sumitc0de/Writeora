@@ -27,15 +27,15 @@ const optionalAuth = require("../middlewares/optionalAuth")
 // ✅ Public
 router.get("/", getAllPosts);
 router.get("/:slug", optionalAuth, getPostBySlug);
+router.get("/category/:category", getPostByCategory);
 
 // ✅ Protected
 router.post("/", protect, createPost);
 router.get("/user/my-posts", protect, getMyPosts);
-router.get("/category/:category", protect, getPostByCategory);
 
 router.get("/user/saved", protect, getUserSavedPosts);
 router.get("/user/stats", protect, getUserStats);
-router.get("/user/stats/:userId", protect, getUserStats);
+router.get("/user/stats/:userId", getUserStats);
 
 router.post("/:slug/likes", protect, toggleLikePostBySlug);
 router.get("/:slug/likes", protect, getPostLikesBySlug);

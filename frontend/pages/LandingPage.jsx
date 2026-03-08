@@ -6,10 +6,28 @@ import HeroVisual from "../src/components/HeroVisual";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../src/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useSEO } from "../src/hooks/useSEO";
 
 const LandingPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  useSEO({
+    title: "Write Manual or AI-Assisted Content - The Hybrid Writing Platform",
+    description: "Writeora gives you total creative control. Write articles manually from scratch or use AI as a co-pilot to speed up your workflow. The best platform for developers to share knowledge.",
+    keywords: "Manual writing platform, AI writing assistant, Hybrid text editor, Developer blogging platform, Free article writer",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Writeora",
+      "url": "https://writeora.ai",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://writeora.ai/discover?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  });
 
   const handleClick = () => {
     if (!user) {
@@ -36,7 +54,7 @@ const LandingPage = () => {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F5C542]/10 border border-[#F5C542]/20 mb-8 backdrop-blur-md"
           >
             <Zap className="w-3 h-3 text-[#F5C542]" />
-            <span className="text-xs font-semibold text-[#F5C542] uppercase tracking-widest">Next Gen AI Platform</span>
+            <span className="text-xs font-semibold text-[#F5C542] uppercase tracking-widest">Write Your Way</span>
           </motion.div>
 
           <motion.h1
@@ -45,14 +63,14 @@ const LandingPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
           >
-            The Future of <br />
+            Your Story, <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">
-              Content Creation
+              Amplified by AI
             </span>
           </motion.h1>
 
           <div className="h-20 sm:h-24 mb-6 flex items-center justify-center lg:justify-start">
-            <TypingEffect text={["Is Data Driven.", "Is Intelligent.", "Is Here."]} />
+            <TypingEffect text={["Write Manually.", "Boost with AI.", "Share Freely."]} />
           </div>
 
           <motion.p
@@ -61,8 +79,8 @@ const LandingPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Unlock your creative potential with Writeora's neural engine.
-            Generate, refine, and publish content at the speed of thought.
+            The ultimate hybrid platform for creators. Write detailed tutorials manually,
+            or summon our AI co-pilot when you need a spark of inspiration. The choice is yours.
           </motion.p>
 
           <motion.div
@@ -76,7 +94,7 @@ const LandingPage = () => {
               className="!bg-white !text-black hover:!bg-gray-200 !shadow-[0_0_20px_rgba(255,255,255,0.3)]"
             >
               <span className="flex items-center justify-center gap-2">
-                Start Creating <ArrowRight className="w-4 h-4" />
+                Start Writing <ArrowRight className="w-4 h-4" />
               </span>
             </Button>
 
@@ -87,7 +105,7 @@ const LandingPage = () => {
               <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-[#F5C542] group-hover:text-black transition-colors">
                 <ChevronRight size={14} />
               </span>
-              See How It Works
+              Explore Features
             </button>
           </motion.div>
         </div>
@@ -105,32 +123,32 @@ const LandingPage = () => {
           <div className="text-center max-w-3xl mx-auto mb-20">
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="w-px h-8 bg-gradient-to-b from-transparent via-[#F5C542] to-transparent"></span>
-              <span className="text-[#F5C542] font-mono text-sm tracking-widest uppercase">Process Initialized</span>
+              <span className="text-[#F5C542] font-mono text-sm tracking-widest uppercase">Hybrid Workflow</span>
               <span className="w-px h-8 bg-gradient-to-b from-transparent via-[#F5C542] to-transparent"></span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-bold mb-6">
-              Neural <span className="text-[#F5C542]">Capabilities</span>
+              Human Creativity, <span className="text-[#F5C542]">AI Speed</span>
             </h2>
             <p className="text-gray-400 text-lg">
-              Advanced algorithms working in harmony to amplify your creativity.
+              We believe AI should support your writing, not replace it. Use our tools to enhance your unique voice.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <HoloCard
-              icon={<Cpu className="w-8 h-8 text-[#F5C542]" />}
-              title="Neural Editor"
-              desc="Adapts to your writing style using advanced NLP models."
+              icon={<PenTool className="w-8 h-8 text-[#F5C542]" />}
+              title="Manual Control"
+              desc="A distraction-free editor designed for you to write your best work, entirely on your terms."
             />
             <HoloCard
               icon={<Zap className="w-8 h-8 text-[#F5C542]" />}
-              title="Instant Generation"
-              desc="From zero to draft in milliseconds with our optimized engine."
+              title="AI Booster"
+              desc="Stuck on a paragraph? Summon AI assistance instantly to overcome writer's block."
             />
             <HoloCard
               icon={<Globe className="w-8 h-8 text-[#F5C542]" />}
-              title="Semantic Translation"
-              desc="Context-aware translation that preserves tone and meaning."
+              title="Publish Globally"
+              desc="Share your knowledge with a community of developers and learners worldwide."
             />
           </div>
         </div>

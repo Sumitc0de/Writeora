@@ -8,6 +8,7 @@ import { useAuth } from "../src/context/AuthContext";
 import Background from "../src/components/Background";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Twitter, Linkedin, ExternalLink } from "lucide-react";
+import { useSEO } from "../src/hooks/useSEO";
 
 const AuthorSidebar = ({ post }) => (
   <div className="space-y-6">
@@ -108,6 +109,25 @@ const Posts = () => {
       },
     });
   };
+
+  useSEO({
+    title: post ? post.title : "Loading Article...",
+    description: post ? (post.description || post.title) : "Read this article on Writeora.",
+    keywords: post ? `${post.category}, ${post.tags?.join(", ") || "AI, Tech, Guide"}` : "Article, Blog",
+    schema: post ? {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": post.title,
+      "image": post.headerImage?.url,
+      "datePublished": post.createdAt,
+      "articleBody": post.content?.substring(0, 150) + "...",
+      "author": {
+        "@type": "Person",
+        "name": post.author?.name || "Anonymous",
+        "url": `https://writeora.ai/profile/${post.author?._id}`
+      }
+    } : null
+  });
 
   useEffect(() => {
     const fetchAll = async () => {

@@ -110,6 +110,7 @@ function Header() {
               <img
                 src={user?.avatar.url || `https://ui-avatars.com/api/?name=${user?.name}&background=F5C542&color=000`}
                 alt="Profile"
+                loading="lazy"
                 className="w-8 h-8 rounded-full border bg-contain border-white/10"
               />
               <span className="text-sm font-medium text-gray-200 max-w-[100px] truncate">
@@ -155,6 +156,7 @@ function Header() {
                 <img
                   src={user?.avatar.url || `https://ui-avatars.com/api/?name=${user?.name}&background=F5C542&color=000`}
                   alt="Profile"
+                  loading="lazy"
                   className="w-12 h-12 rounded-full border-2 border-[#F5C542]/30"
                 />
                 <div className="flex-1 min-w-0">

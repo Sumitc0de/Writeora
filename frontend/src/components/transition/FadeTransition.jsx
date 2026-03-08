@@ -18,7 +18,7 @@ export default function FadeTransition() {
             animate={{ height: "0%" }}
             exit={{ height: "0%" }} // Don't animate out, just clear
             transition={{
-              duration: 0.5,
+              duration: 0.3,
               ease: [0.22, 1, 0.36, 1],
               delay: i * 0.04
             }}

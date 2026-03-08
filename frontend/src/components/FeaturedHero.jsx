@@ -22,11 +22,11 @@ const FeaturedHero = () => {
                         <Sparkles size={12} /> Featured Collection
                     </div>
                     <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 leading-tight">
-                        The Golden Era of <br /> <span className="text-[#F5C542]">Artificial Intelligence</span>
+                        Discover Limitless <br /> <span className="text-[#F5C542]">Knowledge</span>
                     </h1>
                     <p className="text-gray-300 max-w-xl text-sm md:text-base leading-relaxed line-clamp-2 md:line-clamp-none">
-                        Deep dive into the algorithms shaping our future. From LLMs to diffusion models,
-                        explore the latest breakthroughs in AI technology.
+                        Explore trending articles on Artificial Intelligence, Node.js tutorials, and programming best practices.
+                        Read stories from top developers.
                     </p>
                 </motion.div>
             </div>

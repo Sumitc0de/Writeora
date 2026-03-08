@@ -319,7 +319,7 @@ const ContentEditor = () => {
         <div className="relative group mb-8 sm:mb-12">
           {postData.headerImage?.url ? (
             <div className="relative w-full aspect-video sm:aspect-[21/9] rounded-2xl overflow-hidden shadow-2xl group border border-white/[0.05]">
-              <img src={postData.headerImage.url} alt="Cover" className="w-full h-full object-cover" />
+              <img src={postData.headerImage.url} alt="Cover" loading="lazy" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <label htmlFor="headerImageInput" className="cursor-pointer px-4 sm:px-6 py-2 sm:py-3 bg-white/10 backdrop-blur-md rounded-xl text-white text-sm sm:text-base font-medium hover:bg-white/20 transition-all border border-white/10 flex items-center gap-2">
                   <ImageIcon size={18} /> Change Cover

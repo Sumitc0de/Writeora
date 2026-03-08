@@ -91,6 +91,7 @@ const ContentCard = ({
           <img
             src={headerImage.url}
             alt={title}
+            loading="lazy"
             className="w-full h-full object-cover opacity-50 group-hover:scale-105 group-hover:opacity-40 transition-all duration-700 ease-out"
           />
         ) : (

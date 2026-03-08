@@ -6,12 +6,25 @@ import { getPostByCategory } from "../service/postService";
 import Button from "./Button";
 import FeaturedHero from "./FeaturedHero";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSEO } from "../hooks/useSEO";
 
 const categories = ["All", "AI", "Tech", "Finance", "Design", "Marketing"];
 const POSTS_PER_PAGE = 9;
 const STORAGE_KEY = "discover_visible_count_by_category";
 
 export default function DiscoverSection() {
+  useSEO({
+    title: "Discover Top AI Blogs, Tutorials & Tech Guides",
+    description: "Explore trending articles on Artificial Intelligence, Node.js tutorials, and programming best practices. Read stories from top developers.",
+    keywords: "Programming tutorials, AI articles, Tech guides, Developer blogs, Writeora discover",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Writeora Discover",
+      "description": "A collection of top AI and technology articles."
+    }
+  });
+
   const { posts, loading } = usePosts();
 
   const [selectedCategory, setSelectedCategory] = useState("All");

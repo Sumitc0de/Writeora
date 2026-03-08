@@ -3,8 +3,21 @@ import { BookOpen, Video, Code, Terminal, Cpu, Database } from "lucide-react";
 import Background from "../src/components/Background";
 import { motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
+import { useSEO } from "../src/hooks/useSEO";
 
 const Learn = () => {
+  useSEO({
+    title: "Learn AI Tools & Prompt Engineering - Free Tutorials",
+    description: "Master the art of AI with free tutorials on Prompt Engineering, LLM Architecture, and RAG Systems. Your gateway to AI mastery.",
+    keywords: "Learn AI tools, Prompt engineering course, LLM tutorials, RAG systems guide, AI for beginners, Writeora academy",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Writeora Learning Center",
+      "description": "Educational resources for learning AI and writing tools."
+    }
+  });
+
   return (
     <div className="min-h-screen bg-[#050505] text-white pt-24 pb-20 px-4 sm:px-6 lg:px-20 relative overflow-hidden">
       <Background />
@@ -16,53 +29,53 @@ const Learn = () => {
           className="mb-16"
         >
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Learning <span className="text-[#F5C542]">Center</span>
+            AI <span className="text-[#F5C542]">Learning Center</span>
           </h1>
           <p className="text-gray-400 max-w-2xl text-lg">
-            Explore our curated guides and tutorials to master the art of AI-assisted writing and content creation.
+            Explore our curated guides and tutorials to master the art of AI-assisted writing, prompt engineering, and content creation optimization.
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <LearnCard
             icon={<Terminal />}
-            title="Prompt Engineering"
-            desc="Master the art of talking to AI models for better results."
+            title="Prompt Engineering Masterclass"
+            desc="Master the art of talking to AI models for precise, high-quality results."
             level="Beginner"
             delay={0.1}
           />
           <LearnCard
             icon={<Cpu />}
-            title="LLM Architecture"
-            desc="Understand how Large Language Models actually work."
+            title="LLM Architecture Fundamentals"
+            desc="Understand how Large Language Models actually work under the hood."
             level="Intermediate"
             delay={0.2}
           />
           <LearnCard
             icon={<Database />}
-            title="RAG Systems"
-            desc="Retrieval Augmented Generation for data-driven writing."
+            title="RAG Systems Explained"
+            desc="Retrieval Augmented Generation for data-driven, accurate writing."
             level="Advanced"
             delay={0.3}
           />
           <LearnCard
             icon={<Code />}
-            title="API Integration"
-            desc="Build your own writing tools using our API."
+            title="AI API Integration Guide"
+            desc="Build your own custom writing tools using our powerful API."
             level="Advanced"
             delay={0.4}
           />
           <LearnCard
             icon={<Video />}
-            title="Video Scripting"
-            desc="Create viral video scripts with AI assistance."
+            title="Viral Video Scripting with AI"
+            desc="Create engaging video scripts with AI assistance for YouTube & TikTok."
             level="Beginner"
             delay={0.5}
           />
           <LearnCard
             icon={<BookOpen />}
-            title="Storytelling 101"
-            desc="Classic storytelling techniques enhanced by AI."
+            title="Modern Storytelling Techniques"
+            desc="Classic storytelling principles enhanced by artificial intelligence."
             level="Beginner"
             delay={0.6}
           />

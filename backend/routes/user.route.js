@@ -30,7 +30,7 @@ router.get("/profile", protect, (req, res) => {
   res.json({ user: req.user });
 });
 
-router.get("/author/:id", protect, getPublicProfile);
+router.get("/author/:id", getPublicProfile);
 
 // Settings routes (all protected)
 router.get("/settings", protect, getUserSettings);

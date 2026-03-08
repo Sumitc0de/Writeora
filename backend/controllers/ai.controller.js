@@ -54,3 +54,14 @@ exports.generateContent = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+exports.seoCheck = async (req, res) => {
+  try {
+    const { content, keyword } = req.body;
+    if (!content) return res.status(400).json({ message: "Content required" });
+
+    const aiPrompt = buildPrompt({ action: "seo-check", content, keyword });
+    await handleAIResponse(res, aiPrompt);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

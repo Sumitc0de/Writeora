@@ -62,6 +62,8 @@ app.use('/api/user', userRoutes); // ✅ attach routes
 app.use('/api/posts', postRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/ai', aiRoutes)
+app.use('/api/learn', require('./routes/learn.route'));
+app.use('/api/admin', require('./routes/admin.route'));
 // Start Server
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
